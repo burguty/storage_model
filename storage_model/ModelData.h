@@ -13,12 +13,3 @@ private:
     // массив используемых товаров
     bool empty_;
 };
-
-class InputWindow {
-public:
-    InputWindow();
-    ~InputWindow();
-    ModelData* MainLoop();
-private:
-    int GetNumber(std::string s); // выброс исключения
-};
