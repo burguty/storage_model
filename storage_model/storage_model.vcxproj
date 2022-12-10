@@ -152,12 +152,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Frontend.cpp" />
+    <ClCompile Include="InfoField.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Products.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Frontend.h" />
+    <ClInclude Include="InfoField.h" />
     <ClInclude Include="MainWindow.h" />
     <ClInclude Include="ModelData.h" />
     <ClInclude Include="OpenWindow.h" />

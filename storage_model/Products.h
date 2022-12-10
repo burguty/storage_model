@@ -15,7 +15,15 @@ private:
     int product_type_, price_, production_day_, shelf_life_;
 };
 
-class ProductBatch : public IProduct, public IDrawable {
+class IClickable : public IDrawable {
+public:
+    IClickable(int x0, int y0);
+    virtual void DrawInformation(sf::RenderWindow& window) = 0;
+    virtual int GetVisualizationType() = 0;
+    virtual IClickable* Click(int x, int y) = 0;
+};
+
+class ProductBatch : public IProduct, public IClickable {
 public:
     ProductBatch(int product_type, int price, int production_day, 
         int count_at_box, int box_count, int x0, int y0);
@@ -25,9 +33,13 @@ public:
     bool Sell(int box_count);
     virtual void draw(sf::RenderWindow& window);
     virtual void Move(int x, int y);
-    virtual bool Click(int x, int y);
+    virtual void DrawInformation(sf::RenderWindow& window);
+    virtual int GetVisualizationType();
+    virtual IClickable* Click(int x, int y);
 private:
     int count_at_box_, box_count_;
+    const int width = 30, height = 30;
+    sf::RectangleShape texture_;
 };
 
 class StorageRoom : public IDrawable {
