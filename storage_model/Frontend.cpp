@@ -89,3 +89,5 @@ void InputLine::DeleteSymbol() {
     if (!text_.empty())
         text_.pop_back();
 }
+
+IDrawable::IDrawable(int x0, int y0) :x0_(x0), y0_(y0) {}

@@ -50,3 +50,13 @@ private:
     sf::RectangleShape line_;
     bool status_ = false;
 };
+
+class IDrawable {
+public:
+    IDrawable(int x0, int y0);
+    virtual void draw(sf::RenderWindow& window) = 0;
+    virtual void Move(int x, int y) = 0;
+    virtual bool Click(int x0, int y0) = 0;
+private:
+    int x0_, y0_;
+};
