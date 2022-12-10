@@ -30,8 +30,5 @@ int main() {
         inputline.draw(window);
         window.display();
     }
-
-
-    }
     return 0;
 }
