@@ -19,7 +19,6 @@ int main() {
         window.draw(shape);
         window.display();
 
-
     }
     // коммент
     return 0;
