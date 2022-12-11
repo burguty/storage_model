@@ -5,8 +5,8 @@ bool MainWindow::MainLoop(ModelData* data) {
     sf::Font font;
     font.loadFromFile("Data/ArialRegular.ttf");
 
-    IClickable* info = nullptr;
-    StorageRoom* room = new StorageRoom(100, 100, 0, font);
+    InfoField* info_field = new InfoField(780, 30);
+    StorageRoom* room = new StorageRoom(0, 100, 100, font);
     std::wstring add = L"Добавить  партию", del = L"Удалить";
     Button* add_button = new Button(30, 700, 250, 80, add, font);
     Button* delete_button = new Button(300, 700, 250, 80, del, font);
@@ -27,7 +27,7 @@ bool MainWindow::MainLoop(ModelData* data) {
                 } else if (delete_button->Click(x, y)) {
                     room->ProductShipments(90);
                 } else {
-                    info = room->Click(x, y);
+                    info_field->ChangeMode(room->Click(x, y));
                 }
             }
             if (event.type == sf::Event::TextEntered) {
@@ -37,8 +37,7 @@ bool MainWindow::MainLoop(ModelData* data) {
         window.clear(sf::Color(230, 230, 230));
         DrawInterface(window);
         room->draw(window);
-        if (info != nullptr)
-            info->DrawInformation(window, 780, 30);
+        info_field->draw(window);
         add_button->draw(window);
         delete_button->draw(window);
         window.display();

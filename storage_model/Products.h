@@ -3,6 +3,7 @@
 #include "ModelData.h"
 #include <cmath>
 #include <deque>
+#include <vector>
 
 class IProduct {
 protected:
@@ -46,7 +47,7 @@ private:
 
 class StorageRoom : public IClickable {
 public:
-    StorageRoom(int x0, int y0, int product_type, sf::Font& font);
+    StorageRoom(int product_type, int x0, int y0, sf::Font& font);
     virtual ~StorageRoom();
 
     void AddDelivery(ProductBatch* batch);
@@ -65,4 +66,23 @@ private:
     const int width_ = 210, height_ = 120, step_ = 10, in_line_ = 5;
     sf::RectangleShape texture_;
     sf::Text back_text_;
+};
+
+class Storage : public IClickable {
+public:
+    Storage(ModelData*, int x0, int y0);
+    ~Storage();
+
+    void AddDelivery(ProductBatch* batch);
+    std::vector<ProductBatch*> Clearing(int day);
+    int RequestPrice(int product_type, int products_count);
+    void ProductShipments(int product_type, int products_count);
+
+    virtual void draw(sf::RenderWindow& window);
+    virtual void Move(int x, int y);
+    virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0);
+    virtual int GetVisualizationType();
+    virtual IClickable* Click(int x, int y);
+private:
+    std::vector<StorageRoom*> rooms;
 };

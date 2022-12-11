@@ -54,6 +54,7 @@ private:
 class IDrawable {
 public:
     IDrawable(int x0, int y0);
+    virtual ~IDrawable() {}
     virtual void draw(sf::RenderWindow& window) = 0;
     virtual void Move(int x, int y) = 0;
 protected:

@@ -1,6 +1,7 @@
 #pragma once
 #include "Products.h"
 #include "ModelData.h"
+#include "InfoField.h"
 
 class MainWindow {
 public:

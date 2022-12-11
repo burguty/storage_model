@@ -75,12 +75,13 @@ void ProductBatch::draw(sf::RenderWindow& window) {
 }
 void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
     sf::CircleShape circle(10, 50);
+    circle.setFillColor(sf::Color::Green);
     circle.setPosition(x0, y0);
     window.draw(circle);
 }
 
 // StorageRoom
-StorageRoom::StorageRoom(int x0, int y0, int product_type, sf::Font& font) :
+StorageRoom::StorageRoom(int product_type, int x0, int y0, sf::Font& font) :
     IClickable(x0, y0), product_type_(product_type) {
     texture_.setPosition(x0, y0);
     texture_.setFillColor(sf::Color::White);
