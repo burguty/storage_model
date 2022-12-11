@@ -59,3 +59,17 @@ public:
 protected:
     int x0_, y0_;
 };
+
+class TextLine : public WindowObject {
+public:
+    TextLine(int x0, int y0, int len_x, int len_y, std::wstring text, 
+        sf::Font& font, int letter_size = 24, sf::Color color_outline = sf::Color::Transparent,
+        sf::Color color_fill = sf::Color::Transparent);
+    virtual void draw(sf::RenderWindow& window);
+    bool Click(int x, int y);
+private:
+    int len_x_, len_y_;
+    sf::RectangleShape line_;
+    std::wstring text_ = L"";
+    sf::Text text_sfml_;
+};
