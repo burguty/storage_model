@@ -1,5 +1,5 @@
 #pragma once
-#include "Frontend.h"
+#include "Products.h"
 #include "ModelData.h"
 
 class MainWindow {

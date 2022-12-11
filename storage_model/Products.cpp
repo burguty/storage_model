@@ -64,6 +64,8 @@ IClickable* ProductBatch::Click(int x, int y) {
 void ProductBatch::draw(sf::RenderWindow& window) {
     window.draw(texture_);
 }
-void ProductBatch::DrawInformation(sf::RenderWindow& window) {
-
+void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
+    sf::CircleShape circle(10, 50);
+    circle.setPosition(x0, y0);
+    window.draw(circle);
 }
