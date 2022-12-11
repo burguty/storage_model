@@ -27,7 +27,7 @@ class ProductBatch : public IProduct, public IClickable {
 public:
     ProductBatch(int product_type, int price, int production_day, 
         int count_at_box, int box_count, int x0, int y0);
-    int Reduction(int new_cost);
+    void Reduction(int new_cost);
     int CalculateRequiredCount(int products_count);
     int RequestPrice(int box_count);
     bool Sell(int box_count);

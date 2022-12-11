@@ -1,9 +1,9 @@
 #include "Products.h"
 
+int shelf_lifes[3] = {2, 5, 4};
 int GetShelfLife(int type) {
     return shelf_lifes[type];
 }
-int shelf_lifes[3] = {2, 5, 4};
 
 //IClickable
 IClickable::IClickable(int x0, int y0) :IDrawable(x0, y0) {}
@@ -35,7 +35,7 @@ ProductBatch::ProductBatch(int product_type, int price, int production_day,
     texture_.setOutlineColor(sf::Color::Black);
     texture_.setSize(sf::Vector2f(width, height));
 }
-int ProductBatch::Reduction(int new_cost) {
+void ProductBatch::Reduction(int new_cost) {
     ChangePrice(new_cost);
 }
 int ProductBatch::CalculateRequiredCount(int products_count) {
@@ -63,4 +63,7 @@ IClickable* ProductBatch::Click(int x, int y) {
 }
 void ProductBatch::draw(sf::RenderWindow& window) {
     window.draw(texture_);
+}
+void ProductBatch::DrawInformation(sf::RenderWindow& window) {
+
 }
