@@ -6,7 +6,7 @@ int GetShelfLife(int type) {
 }
 
 //IClickable
-IClickable::IClickable(int x0, int y0) : IDrawable(x0, y0) {}
+IClickable::IClickable(int x0, int y0) :IDrawable(x0, y0) {}
 
 // IProduct
 IProduct::IProduct(int product_type, int price, int production_day) :
@@ -64,8 +64,6 @@ IClickable* ProductBatch::Click(int x, int y) {
 void ProductBatch::draw(sf::RenderWindow& window) {
     window.draw(texture_);
 }
-void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
-    sf::CircleShape circle(10, 50);
-    circle.setPosition(x0, y0);
-    window.draw(circle);
+void ProductBatch::DrawInformation(sf::RenderWindow& window) {
+
 }

@@ -1,6 +1,6 @@
 #pragma once
+#include "Frontend.h"
 #include "ModelData.h"
-#include "Products.h"
 
 class MainWindow {
 public:

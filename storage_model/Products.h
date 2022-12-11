@@ -18,7 +18,7 @@ private:
 class IClickable : public IDrawable {
 public:
     IClickable(int x0, int y0);
-    virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0) = 0;
+    virtual void DrawInformation(sf::RenderWindow& window) = 0;
     virtual int GetVisualizationType() = 0;
     virtual IClickable* Click(int x, int y) = 0;
 };
@@ -33,7 +33,7 @@ public:
     bool Sell(int box_count);
     virtual void draw(sf::RenderWindow& window);
     virtual void Move(int x, int y);
-    virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0);
+    virtual void DrawInformation(sf::RenderWindow& window);
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
 private:
