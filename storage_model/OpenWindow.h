@@ -8,4 +8,5 @@ public:
     virtual ~OpenWindow();
     ModelData* MainLoop();
 private:
+
 };
