@@ -16,7 +16,8 @@ private:
     int number_days_;
     int number_shops_;
     int number_products_ = 0;
-    bool used_products_[20];
+    bool used_products_[17];
+    int count_products_[17];
     bool empty_ = true;
 };
 
