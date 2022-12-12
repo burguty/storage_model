@@ -4,6 +4,7 @@ int space_between = 5;
 int len_string = 100;
 int height_string = 30;
 
+OpenWindow::~OpenWindow() {}
 ModelData* OpenWindow::MainLoop() {
     sf::RenderWindow window(sf::VideoMode(1100, 800), "Input model");
     sf::Font font;
