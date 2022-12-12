@@ -2,11 +2,10 @@
 #include "ModelData.h"
 #include "Frontend.h"
 
-class InputWindow {
+class OpenWindow {
 public:
-    InputWindow();
-    ~InputWindow();
+    OpenWindow();
+    virtual ~OpenWindow();
     ModelData* MainLoop();
 private:
-    int GetNumber(std::string s); // выброс исключения
 };

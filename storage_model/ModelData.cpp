@@ -4,6 +4,11 @@
 #include "ModelData.h"
 #include "Frontend.h"
 
+int shelf_lifes[3] = {2, 5, 4};
+int GetShelfLife(int type) {
+    return shelf_lifes[type];
+}
+
 ModelData::ModelData(int number_days, int number_shops, std::vector<CheckBox*>& check_boxes) :
     number_days_(number_days), number_shops_(number_shops) {
     for (int i = 0; i < check_boxes.size(); ++i) {

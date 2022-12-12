@@ -1,4 +1,5 @@
 #pragma once
+#include "Frontend.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -21,3 +22,4 @@ private:
 
 std::string FromIntToString(int value);
 int FromStringToInt(std::string str);
+int GetShelfLife(int type);

@@ -1,10 +1,5 @@
 #include "Products.h"
 
-int shelf_lifes[3] = {2, 5, 4};
-int GetShelfLife(int type) {
-    return shelf_lifes[type];
-}
-
 //IClickable
 IClickable::IClickable(int x0, int y0) :IDrawable(x0, y0) {}
 

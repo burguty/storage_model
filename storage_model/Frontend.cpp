@@ -93,8 +93,8 @@ void InputLine::DeleteSymbol() {
 IDrawable::IDrawable(int x0, int y0) :x0_(x0), y0_(y0) {}
 
 TextLine::TextLine(int x0, int y0, int len_x, int len_y, std::wstring text,
-    sf::Font& font, int letter_size = 24, sf::Color color_outline = sf::Color::Transparent, 
-    sf::Color color_fill = sf::Color::Transparent) : WindowObject(x0, y0), 
+    sf::Font& font, int letter_size, sf::Color color_outline, 
+    sf::Color color_fill) : WindowObject(x0, y0), 
     len_x_(len_x), len_y_(len_y), text_(text) {
     text_sfml_.setFont(font);
     text_sfml_.setString(text);
@@ -104,7 +104,7 @@ TextLine::TextLine(int x0, int y0, int len_x, int len_y, std::wstring text,
     line_.setOutlineColor(color_outline);
     line_.setFillColor(color_fill);
     line_.setPosition(x0, y0);
-    line_.setSize({ len_x, len_y });
+    line_.setSize(sf::Vector2f(len_x, len_y));
 }
 
 void TextLine::draw(sf::RenderWindow& window) {
