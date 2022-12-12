@@ -4,7 +4,7 @@
 
 class OpenWindow {
 public:
-    OpenWindow();
+    OpenWindow() = default;
     ~OpenWindow();
     ModelData* MainLoop();
 private:
