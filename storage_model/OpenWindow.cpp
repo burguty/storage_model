@@ -57,4 +57,5 @@ ModelData* OpenWindow::MainLoop() {
         }
         window.display();
     }
+    return nullptr;
 }
