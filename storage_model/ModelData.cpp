@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-#include <algorithm>
 #include "ModelData.h"
 #include "Frontend.h"
 
@@ -64,6 +61,14 @@ int FromStringToInt(std::string str) {
         ans += (z - '0');
     }
     return ans;
+}
+
+std::wstring product_name[17] = { L"Сахар" , L"Соль", L"Каша", L"Хлопья", L"Макароны", L"Чай", 
+L"Шоколад", L"Кофе", L"Масло", L"Рыба", L"Творог", L"Молоко", L"Сыр", 
+L"Вино", L"Курица", L"Говядина"};
+
+std::wstring GetProductName(int type) {
+    return product_name[type];
 }
 
 int shelf_lifes[17];

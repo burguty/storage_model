@@ -63,6 +63,7 @@ protected:
 
 class TextLine : public WindowObject {
 public:
+    TextLine();
     TextLine(int x0, int y0, int len_x, int len_y, std::wstring text, 
         sf::Font& font, int letter_size = 24, sf::Color color_outline = sf::Color::Transparent,
         sf::Color color_fill = sf::Color::Transparent);

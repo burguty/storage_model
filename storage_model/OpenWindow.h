@@ -5,8 +5,10 @@
 class OpenWindow {
 public:
     OpenWindow();
-    virtual ~OpenWindow();
+    ~OpenWindow();
     ModelData* MainLoop();
 private:
-
+    std::wstring number_days_sfml_ = L"";
+    std::wstring number_shops_sfml_ = L"";
+    std::wstring count_products_sfml_[17];
 };

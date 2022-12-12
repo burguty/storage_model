@@ -92,6 +92,8 @@ void InputLine::DeleteSymbol() {
 
 IDrawable::IDrawable(int x0, int y0) :x0_(x0), y0_(y0) {}
 
+TextLine::TextLine() : WindowObject(0, 0) {}
+
 TextLine::TextLine(int x0, int y0, int len_x, int len_y, std::wstring text,
     sf::Font& font, int letter_size, sf::Color color_outline, 
     sf::Color color_fill) : WindowObject(x0, y0), 

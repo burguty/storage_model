@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 class ModelData {
 public:
@@ -24,3 +25,4 @@ private:
 std::string FromIntToString(int value);
 int FromStringToInt(std::string str);
 int GetShelfLife(int type);
+std::wstring GetProductName(int type);
