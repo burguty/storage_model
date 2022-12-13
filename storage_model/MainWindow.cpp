@@ -31,7 +31,11 @@ bool MainWindow::MainLoop(ModelData* data) {
                 }
             }
             if (event.type == sf::Event::TextEntered) {
-                // if (event.text.unicode == 8)
+                if (event.text.unicode == 8) {
+                    // delete last 
+                } else {
+                    // event.text.unicode - символ
+                }
             }
         }
         window.clear(sf::Color(230, 230, 230));

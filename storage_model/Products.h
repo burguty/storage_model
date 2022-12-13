@@ -6,9 +6,11 @@
 #include <vector>
 
 class IProduct {
-protected:
+public:
     IProduct(int product_type, int price, int production_day);
     virtual ~IProduct();
+    int GetProductType();
+protected:
     int GetPrice();
     int GetRemains(int day);
     void ChangePrice(int new_price);
@@ -41,7 +43,7 @@ public:
     virtual IClickable* Click(int x, int y);
 private:
     int count_at_box_, box_count_;
-    const int width = 30, height = 30;
+    const int width = 15, height = 15;
     sf::RectangleShape texture_;
 };
 
@@ -63,15 +65,15 @@ public:
 private:
     int product_type_;
     std::deque<ProductBatch*>batches_;
-    const int width_ = 210, height_ = 120, step_ = 10, in_line_ = 5;
+    const int width_ = 150, height_ = 90, step_ = 10, in_line_ = 5;
     sf::RectangleShape texture_;
     sf::Text back_text_;
 };
 
 class Storage : public IClickable {
 public:
-    Storage(ModelData*, int x0, int y0);
-    ~Storage();
+    Storage(ModelData* data, int x0, int y0, sf::Font& font);
+    virtual ~Storage();
 
     void AddDelivery(ProductBatch* batch);
     std::vector<ProductBatch*> Clearing(int day);
@@ -84,5 +86,7 @@ public:
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
 private:
-    std::vector<StorageRoom*> rooms;
+    StorageRoom* rooms_[17];
+    const int width_ = 550, height_ = 350, step_ = 15, in_line_ = 3;
+    sf::RectangleShape texture_;
 };

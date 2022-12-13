@@ -18,6 +18,9 @@ int IProduct::GetRemains(int day) {
 void IProduct::ChangePrice(int new_price) {
     price_ = new_price;
 }
+int IProduct::GetProductType() {
+    return product_type_;
+}
 
 // ProductBatch
 ProductBatch::ProductBatch(int product_type, int price, int production_day, 
@@ -152,6 +155,67 @@ void StorageRoom::draw(sf::RenderWindow& window) {
 void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
     sf::CircleShape circle(10, 50);
     circle.setFillColor(sf::Color::Black);
+    circle.setPosition(x0, y0);
+    window.draw(circle);
+}
+
+// Storage
+Storage::Storage(ModelData* data, int x0, int y0, sf::Font& font) :
+    IClickable(x0, y0) {
+    int nomb = 0;
+    for (int i = 0; i < 17; i++) {
+        if (data->IsBeingProductUsed(i)) {
+            rooms_[i] = new StorageRoom(i,
+                x0 + step_ + (step_ + 150) * (nomb % in_line_),
+                y0_ + step_ + (step_ + 90) * (nomb / in_line_), font);
+        } else {
+            rooms_[i] = nullptr;
+        }
+    }
+}
+Storage::~Storage() {
+    for (int i = 0; i < 17; i++) {
+        delete rooms_[i];
+    }
+}
+
+void Storage::AddDelivery(ProductBatch* batch) {
+    rooms_[batch->GetProductType()]->AddDelivery(batch);
+}
+int Storage::RequestPrice(int product_type, int products_count) {
+    return rooms_[product_type]->RequestPrice(products_count);
+}
+void Storage::ProductShipments(int product_type, int products_count) {
+    rooms_[product_type]->ProductShipments(products_count);
+}
+
+void Storage::draw(sf::RenderWindow& window) {
+    window.draw(texture_);
+    for (int i = 0; i < 17; i++)
+        if (rooms_[i] != nullptr)
+            rooms_[i]->draw(window);
+}
+void Storage::Move(int x, int y) {
+    x0_ = x;
+    y0_ = y;
+    texture_.setPosition(x, y);
+}
+int Storage::GetVisualizationType() {
+    return 0;
+}
+IClickable* Storage::Click(int x, int y) {
+    for (int i = 0; i < 17; i++) {
+        IClickable* result = rooms_[i]->Click(x, y);
+        if (result != nullptr)
+            return result;
+    }
+    if (x0_ <= x && x <= x0_ + width_ && y0_ <= y && y <= y0_ + height_)
+        return static_cast<IClickable*>(this);
+    return nullptr;
+}
+void Storage::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
+    sf::CircleShape circle(10, 50);
+    circle.setFillColor(sf::Color::Red);
     circle.setPosition(x0, y0);
     window.draw(circle);
 }
