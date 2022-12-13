@@ -10,7 +10,7 @@ public:
     virtual void Move(int x, int y);
 private:
     int visualization_type_ = -1;
-    const int width_ = 220, height_ = 400;
+    const int width_ = 1640 - 1170, height_ = 400;
     IClickable* object_ = nullptr;
     sf::RectangleShape texture_;
 };

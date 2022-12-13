@@ -63,6 +63,8 @@ public:
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
 private:
+    int CalculateXForBatch(int ind = -1);
+    int CalculateYForBatch(int ind = -1);
     int product_type_;
     std::deque<ProductBatch*>batches_;
     const int width_ = 150, height_ = 90, step_ = 10, in_line_ = 5;
@@ -87,6 +89,6 @@ public:
     virtual IClickable* Click(int x, int y);
 private:
     StorageRoom* rooms_[17];
-    const int width_ = 550, height_ = 350, step_ = 15, in_line_ = 3;
+    const int width_ = 1150 - 300, height_ = 350, step_ = 15, in_line_ = 3;
     sf::RectangleShape texture_;
 };

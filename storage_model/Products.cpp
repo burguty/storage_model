@@ -101,8 +101,7 @@ StorageRoom::~StorageRoom() {
 }
 
 void StorageRoom::AddDelivery(ProductBatch* batch) {
-    batch->Move(x0_ + step_ + (30 + step_) * (batches_.size() % in_line_),
-        y0_ + step_ + (30 + step_) * (batches_.size() / in_line_));
+    batch->Move(CalculateXForBatch(), CalculateYForBatch());
     batches_.push_back(batch);
 }
 void StorageRoom::ProductShipments(int products_count) {
@@ -115,8 +114,7 @@ void StorageRoom::ProductShipments(int products_count) {
         products_count -= count;
     }
     for (int i = 0; i < batches_.size(); i++) {
-        batches_[i]->Move(x0_ + step_ + (30 + step_) * (i % in_line_),
-            y0_ + step_ + (30 + step_) * (i / in_line_));
+        batches_[i]->Move(CalculateXForBatch(i), CalculateYForBatch(i));
     }
 }
 int StorageRoom::RequestPrice(int products_count) {
@@ -126,6 +124,14 @@ int StorageRoom::RequestPrice(int products_count) {
         products_count -= batches_[i]->CalculateSellingProducts(products_count);
     }
     return price;
+}
+int StorageRoom::CalculateXForBatch(int ind) {
+    return x0_ + step_ + (15 + step_) * 
+        ((ind == -1 ? batches_.size() : ind) % in_line_);
+}
+int StorageRoom::CalculateYForBatch(int ind) {
+    return y0_ + step_ + (15 + step_) * 
+        ((ind == -1 ? batches_.size() : ind) / in_line_);
 }
 
 void StorageRoom::Move(int x, int y) {
@@ -163,15 +169,27 @@ void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
 Storage::Storage(ModelData* data, int x0, int y0, sf::Font& font) :
     IClickable(x0, y0) {
     int nomb = 0;
-    for (int i = 0; i < 17; i++) {
-        if (data->IsBeingProductUsed(i)) {
-            rooms_[i] = new StorageRoom(i,
+    for (int product_type = 0; product_type < 17; product_type++) {
+        if (data->IsBeingProductUsed(product_type)) {
+            rooms_[product_type] = new StorageRoom(product_type,
                 x0 + step_ + (step_ + 150) * (nomb % in_line_),
                 y0_ + step_ + (step_ + 90) * (nomb / in_line_), font);
+            if (data->GetCountProduct(product_type) != 0) {
+                rooms_[product_type]->AddDelivery(new ProductBatch(product_type,
+                    GetProductPrice(product_type), 0,
+                    GetCountAtBox(product_type), data->GetCountProduct(product_type),
+                    0, 0));
+            }
+            nomb++;
         } else {
-            rooms_[i] = nullptr;
+            rooms_[product_type] = nullptr;
         }
     }
+    texture_.setPosition(x0, y0);
+    texture_.setFillColor(sf::Color::White);
+    texture_.setSize(sf::Vector2f(width_, height_));
+    texture_.setOutlineThickness(3);
+    texture_.setOutlineColor(sf::Color::Black);
 }
 Storage::~Storage() {
     for (int i = 0; i < 17; i++) {
@@ -205,6 +223,8 @@ int Storage::GetVisualizationType() {
 }
 IClickable* Storage::Click(int x, int y) {
     for (int i = 0; i < 17; i++) {
+        if (rooms_[i] == nullptr)
+            continue;
         IClickable* result = rooms_[i]->Click(x, y);
         if (result != nullptr)
             return result;

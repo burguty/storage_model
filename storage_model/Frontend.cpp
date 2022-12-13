@@ -54,6 +54,7 @@ InputLine::InputLine(int x0, int y0, int len_x, int len_y, sf::Font& font, int l
     text_sfml_.setFont(font);
     text_sfml_.setPosition(x0 + 10, y0 + len_y / 2 - letter_size / 2);
     text_sfml_.setCharacterSize(letter_size);
+    text_sfml_.setFillColor(sf::Color::Black);
     line_.setOutlineColor(sf::Color::Black);
     line_.setOutlineThickness(3);
     line_.setPosition(x0_, y0_);
@@ -88,10 +89,6 @@ void InputLine::DeleteSymbol() {
         return;
     if (!text_.empty())
         text_.pop_back();
-}
-
-void InputLine::SetFillColor(sf::Color color) {
-    line_.setFillColor(color);
 }
 
 void InputLine::SetStatus(bool status) {

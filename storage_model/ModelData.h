@@ -23,7 +23,7 @@ private:
     bool empty_ = true;
 };
 
-std::string FromIntToString(int value);
-int FromStringToInt(std::string str);
+int GetProductPrice(int type);
+int GetCountAtBox(int type);
 int GetShelfLife(int type);
 std::wstring GetProductName(int type);
