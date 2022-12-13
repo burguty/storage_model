@@ -4,8 +4,11 @@
 
 class OpenWindow {
 public:
-    OpenWindow();
-    virtual ~OpenWindow();
+    OpenWindow() = default;
+    ~OpenWindow();
     ModelData* MainLoop();
 private:
+    int number_days_ = 0;
+    int number_shops_ = 0;
+    int count_products_[17];
 };

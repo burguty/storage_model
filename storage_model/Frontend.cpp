@@ -90,7 +90,21 @@ void InputLine::DeleteSymbol() {
         text_.pop_back();
 }
 
+void InputLine::SetFillColor(sf::Color color) {
+    line_.setFillColor(color);
+}
+
+void InputLine::SetStatus(bool status) {
+    status_ = status;
+}
+
+void InputLine::SetTextColor(sf::Color color) {
+    text_sfml_.setFillColor(color);
+}
+
 IDrawable::IDrawable(int x0, int y0) :x0_(x0), y0_(y0) {}
+
+TextLine::TextLine() : WindowObject(0, 0) {}
 
 TextLine::TextLine(int x0, int y0, int len_x, int len_y, std::wstring text,
     sf::Font& font, int letter_size, sf::Color color_outline, 
@@ -99,6 +113,7 @@ TextLine::TextLine(int x0, int y0, int len_x, int len_y, std::wstring text,
     text_sfml_.setFont(font);
     text_sfml_.setString(text);
     text_sfml_.setPosition(x0 + 10, y0 + len_y / 2 - letter_size / 2);
+    text_sfml_.setFillColor(sf::Color::Black);
     text_sfml_.setCharacterSize(letter_size);
     line_.setOutlineThickness(3);
     line_.setOutlineColor(color_outline);
