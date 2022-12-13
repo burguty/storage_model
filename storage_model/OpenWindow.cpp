@@ -1,48 +1,81 @@
 #include "OpenWindow.h"
 
-int space_between = 5;
-int len_string = 100;
-int height_string = 30;
+int space_between = 70;
+int len_input = 250;
+int len_string = 150;
+int height = 30;
+
+bool CheckInputedFields(CheckBox* check_boxes[], InputLine* inputing_field_code[]) {
+    for (int i = 0; i < 19; ++i) {
+        if (i >= 2) {
+            if (!check_boxes[i - 2]->GetStatus() || (check_boxes[i - 2]->GetStatus() &&
+                !inputing_field_code[i]->GetText().empty())) {
+                continue;
+            }
+        }
+        else {
+            if (!inputing_field_code[i]->GetText().empty()) {
+                continue;
+            }
+        }
+        return false;
+    }
+    return true;
+}
 
 OpenWindow::~OpenWindow() {}
+
 ModelData* OpenWindow::MainLoop() {
     sf::RenderWindow window(sf::VideoMode(1100, 800), "Input model");
     sf::Font font;
     font.loadFromFile("Data/ArialRegular.ttf");
 
-    int space_vert = (800 - height_string * 20) / 21;
-    TextLine string_number_days(space_between, space_vert, 0, 0, L"¬ведите кол-во дней:", font);
-    InputLine input_number_days(2 * space_between + len_string, space_vert, len_string, height_string, font);
-    TextLine string_number_shops(space_between, 2 * space_vert + height_string, len_string, height_string, 
-        L"¬ведите кол-во магазинов:", font);
-    InputLine input_number_shops(2 * space_between + len_string, 2 * space_vert + height_string, 
-        len_string, height_string, font);
+    int space_vert = (800 - height * 20) / 21;
+    TextLine* string_number_days = new TextLine(space_between, space_vert + 10, 0, 0, 
+        L"¬ведите кол-во дней:", font, 22);
+    InputLine* input_number_days = new InputLine(2 * space_between + len_input, space_vert, 
+        len_input, height, font, 20);
+    TextLine* string_number_shops = new TextLine(space_between, 2 * space_vert + height, 
+        len_string, height, L"¬ведите кол-во магазинов:", font, 22);
+    InputLine* input_number_shops = new InputLine(2 * space_between + len_input, 2 * space_vert + height, 
+        len_input, height, font, 20);
     TextLine* name_product[17];
     CheckBox* check_boxes[17];
     InputLine* input_quantity[17];
     for (int i = 0; i < 17; ++i) {
-        int y_coord = space_vert * (i + 3) + height_string * (i + 2);
-        name_product[i] = new TextLine(space_between, y_coord, len_string, height_string, 
-            GetProductName(i), font, 24, sf::Color::Black);
-        check_boxes[i] = new CheckBox(2 * space_between + len_string, y_coord, height_string, height_string);
-        input_quantity[i] = new InputLine(3 * space_between + len_string + height_string, y_coord, 
-            len_string, height_string, font);
+        int y_coord = space_vert * (i + 3) + height * (i + 2);
+        name_product[i] = new TextLine(space_between, y_coord, len_string, height, 
+            GetProductName(i), font, 22);
+        check_boxes[i] = new CheckBox(2 * space_between + len_string, y_coord, height, height);
+        input_quantity[i] = new InputLine(3 * space_between + len_string + height, y_coord, 
+            len_input, height, font, 20);
     }
     std::wstring start_button_string = L"«апустить";
-    Button start_button(20 * space_vert + 19 * height_string, 1100 - space_between - len_string, 
-        len_string, height_string, start_button_string, font);
+    Button* start_button = new Button(1100 - space_between - 130, 20 * space_vert + 19 * height,
+        130, height, start_button_string, font, 22);
 
-    int operation = 0;
+    InputLine* inputing_field_code[19];
+    inputing_field_code[0] = input_number_days;
+    inputing_field_code[1] = input_number_shops;
+    for (int i = 0; i < 17; ++i) {
+        inputing_field_code[2 + i] = input_quantity[i];
+    }
+
+    int current_inputing = -1;
     while (window.isOpen()) {
         window.clear(sf::Color(230, 230, 230));
-        input_number_days.draw(window);
-        input_number_shops.draw(window);
+        string_number_days->draw(window);
+        string_number_shops->draw(window);
+        input_number_days->draw(window);
+        input_number_shops->draw(window);
         for (int i = 0; i < 17; ++i) {
             name_product[i]->draw(window);
             check_boxes[i]->draw(window);
-            input_quantity[i]->draw(window);
+            if (check_boxes[i]->GetStatus()) {
+                input_quantity[i]->draw(window);
+            }
         }
-        start_button.draw(window);
+        start_button->draw(window);
 
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -50,13 +83,86 @@ ModelData* OpenWindow::MainLoop() {
                 window.close();
                 return nullptr;
             }
-            else if (event.type == sf::Event::MouseButtonPressed
-                && event.mouseButton.button == sf::Mouse::Left) {
+            if (event.type == sf::Event::MouseButtonPressed && 
+                event.mouseButton.button == sf::Mouse::Left) {
                 int x = event.mouseButton.x, y = event.mouseButton.y;
+
+                if (start_button->Click(x, y) && 
+                    CheckInputedFields(check_boxes, inputing_field_code)) {
+                    window.close();
+                    break;
+                }
                 
+                for (int i = 0; i < 17; ++i) {
+                    check_boxes[i]->Click(x, y);
+                }
+
+                bool is_any_input_clicked = false;
+                for (int i = 0; i < 19; ++i) {
+                    if (i >= 2 && i <= 18) {
+                        if (check_boxes[i - 2]->GetStatus() &&
+                            inputing_field_code[i]->Click(x, y)) {
+                            if (current_inputing > -1) {
+                                inputing_field_code[current_inputing]->SetStatus(false);
+                                inputing_field_code[current_inputing]->SetTextColor(sf::Color::Black);
+                            }
+                            if (current_inputing != i) {
+                                current_inputing = i;
+                                is_any_input_clicked = true;
+                                inputing_field_code[i]->SetTextColor(sf::Color::White);
+                            }
+                        }
+                    }
+                    else {
+                        if (inputing_field_code[i]->Click(x, y)) {
+                            if (current_inputing > -1) {
+                                inputing_field_code[current_inputing]->SetStatus(false);
+                                inputing_field_code[current_inputing]->SetTextColor(sf::Color::Black);
+                            }
+                            if (current_inputing != i) {
+                                current_inputing = i;
+                                is_any_input_clicked = true;
+                                inputing_field_code[i]->SetTextColor(sf::Color::White);
+                            }
+                        }
+                    }
+                }
+
+                if (!is_any_input_clicked) {
+                    if (current_inputing != -1) {
+                        inputing_field_code[current_inputing]->SetStatus(false);
+                        inputing_field_code[current_inputing]->SetTextColor(sf::Color::Black);
+                    }
+                    current_inputing = -1;
+                }
+            }
+            if (current_inputing > -1 && event.type == sf::Event::TextEntered) {
+                if (event.text.unicode == 8) {
+                    inputing_field_code[current_inputing]->DeleteSymbol();
+                }
+                else if (event.text.unicode >= '0' && event.text.unicode <= '9') {
+                    inputing_field_code[current_inputing]->TypeSymbol(event.text.unicode);
+                }
             }
         }
         window.display();
     }
-    return nullptr;
+
+    number_days_ = std::stoi(input_number_days->GetText());
+    number_shops_ = std::stoi(input_number_shops->GetText());
+    for (int i = 0; i < 17; ++i) {
+        if (!check_boxes[i]->GetStatus()) continue;
+        count_products_[i] = std::stoi(input_quantity[i]->GetText());
+    }
+    delete string_number_days;
+    delete string_number_shops;
+    delete inputing_field_code[0];
+    delete inputing_field_code[1];
+    ModelData* result = new ModelData(number_days_, number_shops_, check_boxes, count_products_);
+    for (int i = 0; i < 17; ++i) {
+        delete name_product[i];
+        delete check_boxes[i];
+        delete input_quantity[i];
+    }
+    return result;
 }

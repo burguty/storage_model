@@ -1,11 +1,13 @@
 #include "ModelData.h"
 #include "Frontend.h"
 
-ModelData::ModelData(int number_days, int number_shops, std::vector<CheckBox*>& check_boxes) :
+ModelData::ModelData(int number_days, int number_shops, 
+    CheckBox* check_boxes[], int count_products[]) : 
     number_days_(number_days), number_shops_(number_shops) {
-    for (int i = 0; i < check_boxes.size(); ++i) {
+    for (int i = 0; i < 17; ++i) {
         used_products_[i] = check_boxes[i]->GetStatus();
         number_products_ += used_products_[i];
+        count_products_[i] = count_products[i];
     }
     empty_ = (number_products_ == 0);
 }
@@ -28,6 +30,10 @@ bool ModelData::IsEmpty() {
 
 bool ModelData::IsBeingProductUsed(int product_type) {
     return used_products_[product_type];
+}
+
+int ModelData::GetCountProduct(int type) {
+    return count_products_[type];
 }
 
 std::string FromIntToString(int value) {
@@ -64,7 +70,7 @@ int FromStringToInt(std::string str) {
 }
 
 std::wstring product_name[17] = { L"Сахар" , L"Соль", L"Каша", L"Хлопья", L"Макароны", L"Чай", 
-L"Шоколад", L"Кофе", L"Масло", L"Рыба", L"Творог", L"Молоко", L"Сыр", 
+L"Шоколад", L"Кофе", L"Какао", L"Масло", L"Рыба", L"Творог", L"Молоко", L"Сыр",
 L"Вино", L"Курица", L"Говядина"};
 
 std::wstring GetProductName(int type) {

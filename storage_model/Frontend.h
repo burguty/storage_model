@@ -35,13 +35,16 @@ private:
     sf::RectangleShape box_;
 };
 
-class InputLine :public WindowObject {
+class InputLine : public WindowObject {
 public:
     InputLine(int x0, int y0, int len_x, int len_y, sf::Font& font, int letter_size = 24);
     virtual void draw(sf::RenderWindow& window);
     bool Click(int x, int y);
     void TypeSymbol(char c);
     void DeleteSymbol();
+    void SetStatus(bool status);
+    void SetTextColor(sf::Color color);
+    void SetFillColor(sf::Color color);
     std::wstring GetText();
 private:
     int len_x_, len_y_;

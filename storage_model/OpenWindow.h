@@ -8,7 +8,7 @@ public:
     ~OpenWindow();
     ModelData* MainLoop();
 private:
-    std::wstring number_days_sfml_ = L"";
-    std::wstring number_shops_sfml_ = L"";
-    std::wstring count_products_sfml_[17];
+    int number_days_ = 0;
+    int number_shops_ = 0;
+    int count_products_[17];
 };

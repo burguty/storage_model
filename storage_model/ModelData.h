@@ -7,11 +7,12 @@
 
 class ModelData {
 public:
-    ModelData(int number_days, int number_shops, std::vector<CheckBox*>& check_boxes);
+    ModelData(int number_days, int number_shops, CheckBox* check_boxes[], int count_products[]);
     int GetNumberDays();
     int GetNumberShops();
     int GetNumberProducts();
     bool IsEmpty();
+    int GetCountProduct(int type);
     bool IsBeingProductUsed(int product_type);
 private:
     int number_days_;
