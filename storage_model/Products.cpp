@@ -1,19 +1,16 @@
 #include "Products.h"
 
-//IClickable
-IClickable::IClickable(int x0, int y0) :IDrawable(x0, y0) {}
-
 // IProduct
-IProduct::IProduct(int product_type, int price, int production_day) :
-    product_type_(product_type), price_(price), production_day_(production_day) {
-    shelf_life_ = GetShelfLife(product_type);
+IProduct::IProduct(int product_type, int price) :
+    product_type_(product_type), price_(price) {
+    remains_ = GetShelfLife(product_type);
 }
 IProduct::~IProduct() {}
 int IProduct::GetPrice() {
     return price_;
 }
-int IProduct::GetRemains(int day) {
-    return production_day_ + shelf_life_ - day;
+int IProduct::GetRemains() {
+    return remains_;
 }
 void IProduct::ChangePrice(int new_price) {
     price_ = new_price;
@@ -23,14 +20,13 @@ int IProduct::GetProductType() {
 }
 
 // ProductBatch
-ProductBatch::ProductBatch(int product_type, int price, int production_day, 
+ProductBatch::ProductBatch(int product_type, int price,
     int count_at_box, int box_count, int x0, int y0):
-    IProduct(product_type, price, production_day), IClickable(x0, y0), 
+    IProduct(product_type, price), IDrawable(x0, y0), 
     count_at_box_(count_at_box), box_count_(box_count){
     texture_.setPosition(x0, y0);
-    texture_.setFillColor(sf::Color::Black);
     texture_.setOutlineThickness(3);
-    texture_.setOutlineColor(sf::Color::Black);
+    texture_.setOutlineColor(sf::Color(0, 0, 0, 150));
     texture_.setSize(sf::Vector2f(width, height));
 }
 void ProductBatch::Reduction(int new_cost) {
@@ -69,6 +65,10 @@ IClickable* ProductBatch::Click(int x, int y) {
     return nullptr;
 }
 void ProductBatch::draw(sf::RenderWindow& window) {
+    if (GetRemains() <= 2)
+        texture_.setFillColor(sf::Color(255, 0, 0, 120));
+    else
+        texture_.setFillColor(sf::Color(0, 255, 0, 120));
     window.draw(texture_);
 }
 void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
@@ -80,7 +80,7 @@ void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
 
 // StorageRoom
 StorageRoom::StorageRoom(int product_type, int x0, int y0, sf::Font& font) :
-    IClickable(x0, y0), product_type_(product_type) {
+    IDrawable(x0, y0), product_type_(product_type) {
     texture_.setPosition(x0, y0);
     texture_.setFillColor(sf::Color::White);
     texture_.setSize(sf::Vector2f(width_, height_));
@@ -88,10 +88,11 @@ StorageRoom::StorageRoom(int product_type, int x0, int y0, sf::Font& font) :
     texture_.setOutlineColor(sf::Color::Black);
 
     back_text_.setFont(font);
-    back_text_.setString(L"0");
-    back_text_.setCharacterSize(24);
+    back_text_.setString(GetProductName(product_type));
+    back_text_.setStyle(sf::Text::Bold);
+    back_text_.setCharacterSize(26);
     back_text_.setPosition(x0 + 10, y0 + 10);
-    back_text_.setFillColor(sf::Color(0, 255, 0, 180));
+    back_text_.setFillColor(sf::Color(0, 191, 255, 255));
 }
 StorageRoom::~StorageRoom() {
     while (!batches_.empty()) {
@@ -101,8 +102,7 @@ StorageRoom::~StorageRoom() {
 }
 
 void StorageRoom::AddDelivery(ProductBatch* batch) {
-    batch->Move(x0_ + step_ + (30 + step_) * (batches_.size() % in_line_),
-        y0_ + step_ + (30 + step_) * (batches_.size() / in_line_));
+    batch->Move(CalculateXForBatch(), CalculateYForBatch());
     batches_.push_back(batch);
 }
 void StorageRoom::ProductShipments(int products_count) {
@@ -115,8 +115,7 @@ void StorageRoom::ProductShipments(int products_count) {
         products_count -= count;
     }
     for (int i = 0; i < batches_.size(); i++) {
-        batches_[i]->Move(x0_ + step_ + (30 + step_) * (i % in_line_),
-            y0_ + step_ + (30 + step_) * (i / in_line_));
+        batches_[i]->Move(CalculateXForBatch(i), CalculateYForBatch(i));
     }
 }
 int StorageRoom::RequestPrice(int products_count) {
@@ -127,12 +126,15 @@ int StorageRoom::RequestPrice(int products_count) {
     }
     return price;
 }
-
-void StorageRoom::Move(int x, int y) {
-    x0_ = x;
-    y0_ = y;
-    texture_.setPosition(x0_, y0_);
+int StorageRoom::CalculateXForBatch(int ind) {
+    return x0_ + step_ + (15 + step_) * 
+        ((ind == -1 ? batches_.size() : ind) % in_line_);
 }
+int StorageRoom::CalculateYForBatch(int ind) {
+    return y0_ + step_ + (15 + step_) * 
+        ((ind == -1 ? batches_.size() : ind) / in_line_);
+}
+
 int StorageRoom::GetVisualizationType() {
     return 0;
 }
@@ -161,17 +163,31 @@ void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
 
 // Storage
 Storage::Storage(ModelData* data, int x0, int y0, sf::Font& font) :
-    IClickable(x0, y0) {
+    IDrawable(x0, y0) {
     int nomb = 0;
-    for (int i = 0; i < 17; i++) {
-        if (data->IsBeingProductUsed(i)) {
-            rooms_[i] = new StorageRoom(i,
+    for (int product_type = 0; product_type < 17; product_type++) {
+        if (data->IsBeingProductUsed(product_type)) {
+            rooms_[product_type] = new StorageRoom(product_type,
                 x0 + step_ + (step_ + 150) * (nomb % in_line_),
                 y0_ + step_ + (step_ + 90) * (nomb / in_line_), font);
+            if (data->GetCountProduct(product_type) != 0) {
+                for (int i = 0; i < data->GetCountProduct(product_type); i++) {
+                    rooms_[product_type]->AddDelivery(new ProductBatch(product_type,
+                        GetProductPrice(product_type),
+                        GetCountAtBox(product_type), data->GetCountProduct(product_type),
+                        0, 0));
+                }
+            }
+            nomb++;
         } else {
-            rooms_[i] = nullptr;
+            rooms_[product_type] = nullptr;
         }
     }
+    texture_.setPosition(x0, y0);
+    texture_.setFillColor(sf::Color::White);
+    texture_.setSize(sf::Vector2f(width_, height_));
+    texture_.setOutlineThickness(3);
+    texture_.setOutlineColor(sf::Color::Black);
 }
 Storage::~Storage() {
     for (int i = 0; i < 17; i++) {
@@ -195,16 +211,13 @@ void Storage::draw(sf::RenderWindow& window) {
         if (rooms_[i] != nullptr)
             rooms_[i]->draw(window);
 }
-void Storage::Move(int x, int y) {
-    x0_ = x;
-    y0_ = y;
-    texture_.setPosition(x, y);
-}
 int Storage::GetVisualizationType() {
     return 0;
 }
 IClickable* Storage::Click(int x, int y) {
     for (int i = 0; i < 17; i++) {
+        if (rooms_[i] == nullptr)
+            continue;
         IClickable* result = rooms_[i]->Click(x, y);
         if (result != nullptr)
             return result;

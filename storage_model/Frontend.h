@@ -3,16 +3,16 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 
-class WindowObject {
+class IDrawable {
 public:
-    WindowObject(int x0, int y0);
-    virtual ~WindowObject();
+    IDrawable(int x0, int y0);
+    virtual ~IDrawable();
     virtual void draw(sf::RenderWindow& window) = 0;
 protected:
     int x0_, y0_;
 };
 
-class Button : public WindowObject {
+class Button : public IDrawable {
 public:
     Button(int x0, int y0, int len_x, int len_y, std::wstring& text, sf::Font& font, int letter_size = 24);
     virtual void draw(sf::RenderWindow& window);
@@ -23,7 +23,7 @@ private:
     sf::RectangleShape button_;
 };
 
-class CheckBox : public WindowObject {
+class CheckBox : public IDrawable {
 public:
     CheckBox(int x0, int y0, int len_x, int len_y);
     virtual void draw(sf::RenderWindow& window);
@@ -35,7 +35,7 @@ private:
     sf::RectangleShape box_;
 };
 
-class InputLine : public WindowObject {
+class InputLine : public IDrawable {
 public:
     InputLine(int x0, int y0, int len_x, int len_y, sf::Font& font, int letter_size = 24);
     virtual void draw(sf::RenderWindow& window);
@@ -48,25 +48,21 @@ public:
     std::wstring GetText();
 private:
     int len_x_, len_y_;
-    std::wstring text_ = L"";
+    std::wstring text_ = L"1";
     sf::Text text_sfml_;
     sf::RectangleShape line_;
     bool status_ = false;
 };
 
-class IDrawable {
+class IMovable : virtual public IDrawable {
 public:
-    IDrawable(int x0, int y0);
-    virtual ~IDrawable() {}
-    virtual void draw(sf::RenderWindow& window) = 0;
+    IMovable() = default;
+    virtual ~IMovable() {}
     virtual void Move(int x, int y) = 0;
-protected:
-    int x0_, y0_;
 };
 
-class TextLine : public WindowObject {
+class TextLine : public IDrawable {
 public:
-    TextLine();
     TextLine(int x0, int y0, int len_x, int len_y, std::wstring text, 
         sf::Font& font, int letter_size = 24, sf::Color color_outline = sf::Color::Transparent,
         sf::Color color_fill = sf::Color::Transparent);

@@ -5,11 +5,14 @@ int main() {
     OpenWindow open_window;
     MainWindow main_window;
     while (true) {
-        if (open_window.MainLoop() == nullptr) {
+        ModelData* data = open_window.MainLoop();
+        if (data == nullptr) {
             return 0;
         }
-        if (main_window.MainLoop(nullptr)) {
+        if (main_window.MainLoop(data)) {
+            delete data;
             return 0;
         }
+        delete data;
     }
 }
