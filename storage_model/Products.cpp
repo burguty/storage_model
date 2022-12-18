@@ -20,10 +20,10 @@ int IProduct::GetProductType() {
 }
 
 // ProductBatch
-ProductBatch::ProductBatch(int product_type, int price,
+ProductBatch::ProductBatch(int product_type, int price, int purchase_price,
     int count_at_box, int box_count, int x0, int y0):
     IProduct(product_type, price), IDrawable(x0, y0), 
-    count_at_box_(count_at_box), box_count_(box_count){
+    count_at_box_(count_at_box), box_count_(box_count), purchase_price_(purchase_price){
     texture_.setPosition(x0, y0);
     texture_.setOutlineThickness(3);
     texture_.setOutlineColor(sf::Color(0, 0, 0, 150));
@@ -47,10 +47,12 @@ bool ProductBatch::Sell(int products_count) {
     box_count_ -= box_count;
     return box_count_ == 0;
 }
-int ProductBatch::ProductCount() {
+int ProductBatch::ProductsCount() {
     return box_count_ * count_at_box_;
 }
-
+int ProductBatch::PurchasePrice() {
+    return purchase_price_;
+}
 void ProductBatch::Move(int x, int y) {
     x0_ = x;
     y0_ = y;
@@ -71,11 +73,17 @@ void ProductBatch::draw(sf::RenderWindow& window) {
         texture_.setFillColor(sf::Color(0, 255, 0, 120));
     window.draw(texture_);
 }
-void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
-    sf::CircleShape circle(10, 50);
-    circle.setFillColor(sf::Color::Green);
-    circle.setPosition(x0, y0);
-    window.draw(circle);
+void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
+    sf::Text name(L"Партия товара \"" + GetProductName(product_type_) + L"\"" +
+        L"\nКоличество в партии - " + IntToString(count_at_box_ * box_count_) + L" шт." +
+        L"\nСрок годности - " + IntToString(GetRemains()) + L" дней" +
+        L"\nЦена за шт. - " + IntToString(GetPrice()) + L" руб." +
+        L"\nЗакупочная цена за шт. - " + IntToString(purchase_price_) + L" руб." +
+        L"\nСтоимость партии - " + IntToString(GetPrice() * count_at_box_ * box_count_) + L" руб.",
+        font, 24);
+    name.setPosition(x0 + 5, y0 + 5);
+    name.setFillColor(sf::Color::Black);
+    window.draw(name);
 }
 
 // StorageRoom
@@ -134,6 +142,34 @@ int StorageRoom::CalculateYForBatch(int ind) {
     return y0_ + step_ + (15 + step_) * 
         ((ind == -1 ? batches_.size() : ind) / in_line_);
 }
+int StorageRoom::ProductsCount() {
+    int result = 0;
+    for (ProductBatch* batch : batches_) {
+        result += batch->ProductsCount();
+    }
+    return result;
+}
+int StorageRoom::ProductsPrice() {
+    int result = 0;
+    for (ProductBatch* batch : batches_) {
+        result += batch->GetPrice() * batch->ProductsCount();
+    }
+    return result;
+}
+int StorageRoom::ProductsPurchasePrice() {
+    int result = 0;
+    for (ProductBatch* batch : batches_) {
+        result += batch->PurchasePrice();
+    }
+    return result;
+}
+int StorageRoom::SpentOnPurchase() {
+    int result = 0;
+    for (ProductBatch* batch : batches_) {
+        result += batch->PurchasePrice() * batch->ProductsCount();
+    }
+    return result;
+}
 
 int StorageRoom::GetVisualizationType() {
     return 0;
@@ -154,11 +190,17 @@ void StorageRoom::draw(sf::RenderWindow& window) {
     for (auto product_batch : batches_)
         product_batch->draw(window);
 }
-void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
-    sf::CircleShape circle(10, 50);
-    circle.setFillColor(sf::Color::Black);
-    circle.setPosition(x0, y0);
-    window.draw(circle);
+void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
+    sf::Text name(L"Склад товара \"" + GetProductName(product_type_) + L"\"" +
+        L"\nКоличество партий - " + IntToString(batches_.size()) + L" шт." +
+        L"\nКоличество товаров - " + IntToString(ProductsCount()) + L" шт." +
+        L"\nОбщая цена товаров - " + IntToString(ProductsPrice()) + L" руб." +
+        L"\nТекущий доход - " + IntToString(profit) + L" руб." +
+        L"\nТекущая прибыль - " + IntToString(profit - SpentOnPurchase()) + L" руб.",
+        font, 24);
+    name.setPosition(x0 + 5, y0 + 5);
+    name.setFillColor(sf::Color::Black);
+    window.draw(name);
 }
 
 // Storage
@@ -171,12 +213,10 @@ Storage::Storage(ModelData* data, int x0, int y0, sf::Font& font) :
                 x0 + step_ + (step_ + 150) * (nomb % in_line_),
                 y0_ + step_ + (step_ + 90) * (nomb / in_line_), font);
             if (data->GetCountProduct(product_type) != 0) {
-                for (int i = 0; i < data->GetCountProduct(product_type); i++) {
-                    rooms_[product_type]->AddDelivery(new ProductBatch(product_type,
-                        GetProductPrice(product_type),
-                        GetCountAtBox(product_type), data->GetCountProduct(product_type),
-                        0, 0));
-                }
+                rooms_[product_type]->AddDelivery(new ProductBatch(product_type,
+                    GetProductPrice(product_type), GetProductPrice(product_type) / 2,
+                    GetCountAtBox(product_type), data->GetCountProduct(product_type),
+                    0, 0));
             }
             nomb++;
         } else {
@@ -226,7 +266,7 @@ IClickable* Storage::Click(int x, int y) {
         return static_cast<IClickable*>(this);
     return nullptr;
 }
-void Storage::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
+void Storage::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
     sf::CircleShape circle(10, 50);
     circle.setFillColor(sf::Color::Red);
     circle.setPosition(x0, y0);

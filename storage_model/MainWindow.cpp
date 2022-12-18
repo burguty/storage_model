@@ -42,7 +42,7 @@ bool MainWindow::MainLoop(ModelData* data) {
         window.clear(sf::Color(230, 230, 230));
         DrawInterface(window);
         storage->draw(window);
-        info_field->draw(window);
+        info_field->draw(window, font_text);
         button_stop->draw(window);
         window.display();
     }

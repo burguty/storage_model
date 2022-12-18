@@ -56,3 +56,20 @@ int GetProductPrice(int type) {
 int GetShelfLife(int type) {
     return shelf_lifes[type];
 }
+
+std::wstring IntToString(int number) {
+    if (number == 0)
+        return L"0";
+    std::wstring result = L"";
+    bool flag = false;
+    if (number < 0)
+        flag = true, number *= -1;
+    while (number != 0) {
+        result.push_back((number % 10) + '0');
+        number /= 10;
+    }
+    if (flag)
+        result.push_back('-');
+    std::reverse(result.begin(), result.end());
+    return result;
+}
