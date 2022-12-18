@@ -26,7 +26,7 @@ bool CheckInputedFields(CheckBox* check_boxes[], InputLine* inputing_field_code[
 OpenWindow::~OpenWindow() {}
 
 ModelData* OpenWindow::MainLoop() {
-    sf::RenderWindow window(sf::VideoMode(1100, 800), "Input model");
+    sf::RenderWindow window(sf::VideoMode(735, 800), "Input model");
     sf::Font font;
     font.loadFromFile("Data/ArialRegular.ttf");
 
@@ -51,8 +51,8 @@ ModelData* OpenWindow::MainLoop() {
             len_input, height, font, 20);
     }
     std::wstring start_button_string = L"Запустить";
-    Button* start_button = new Button(1100 - space_between - 130, 20 * space_vert + 19 * height,
-        130, height, start_button_string, font, 22);
+    Button* start_button = new Button(735 - space_between - 130, 20 * space_vert + 19 * height,
+        130, height + 3, start_button_string, font, 22);
 
     InputLine* inputing_field_code[19];
     inputing_field_code[0] = input_number_days;
