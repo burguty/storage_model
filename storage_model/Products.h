@@ -7,28 +7,28 @@
 
 class IProduct {
 public:
-    IProduct(int product_type, int price, int production_day);
+    IProduct(int product_type, int price);
     virtual ~IProduct();
     int GetProductType();
-protected:
     int GetPrice();
-    int GetRemains(int day);
+protected:
+    int GetRemains();
     void ChangePrice(int new_price);
 private:
-    int product_type_, price_, production_day_, shelf_life_;
+    int product_type_, price_, remains_;
 };
 
-class IClickable : public IDrawable {
+class IClickable : virtual public IDrawable {
 public:
-    IClickable(int x0, int y0);
+    IClickable() = default;
     virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0) = 0;
     virtual int GetVisualizationType() = 0;
     virtual IClickable* Click(int x, int y) = 0;
 };
 
-class ProductBatch : public IProduct, public IClickable {
+class ProductBatch : public IProduct, public IClickable, public IMovable {
 public:
-    ProductBatch(int product_type, int price, int production_day, 
+    ProductBatch(int product_type, int price,
         int count_at_box, int box_count, int x0, int y0);
     void Reduction(int new_cost);
     int ProductCount();
@@ -58,7 +58,6 @@ public:
     void ProductShipments(int products_count);
 
     virtual void draw(sf::RenderWindow& window);
-    virtual void Move(int x, int y);
     virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0);
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
@@ -83,7 +82,6 @@ public:
     void ProductShipments(int product_type, int products_count);
 
     virtual void draw(sf::RenderWindow& window);
-    virtual void Move(int x, int y);
     virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0);
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);

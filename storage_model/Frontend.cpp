@@ -1,10 +1,10 @@
 #include "Frontend.h"
 
-WindowObject::WindowObject(int x0, int y0) : x0_(x0), y0_(y0) {}
-WindowObject::~WindowObject() {}
+IDrawable::IDrawable(int x0, int y0) : x0_(x0), y0_(y0) {}
+IDrawable::~IDrawable() {}
 
 Button::Button(int x0, int y0, int len_x, int len_y, std::wstring& text, sf::Font& font, int letter_size) :
-    WindowObject(x0, y0), len_x_(len_x), len_y_(len_y) {
+    IDrawable(x0, y0), len_x_(len_x), len_y_(len_y) {
     text_.setFont(font);
     text_.setString(text);
     text_.setPosition(x0 + 10, y0 + len_y / 2 - letter_size / 2);
@@ -25,7 +25,7 @@ void Button::draw(sf::RenderWindow& window) {
 }
 
 CheckBox::CheckBox(int x0, int y0, int len_x, int len_y) :
-    WindowObject(x0, y0), len_x_(len_x), len_y_(len_y) {
+    IDrawable(x0, y0), len_x_(len_x), len_y_(len_y) {
     box_.setOutlineColor(sf::Color::Black);
     box_.setOutlineThickness(3);
     box_.setPosition(x0_, y0_);
@@ -50,7 +50,7 @@ bool CheckBox::GetStatus() {
 }
 
 InputLine::InputLine(int x0, int y0, int len_x, int len_y, sf::Font& font, int letter_size) :
-    WindowObject(x0, y0), len_x_(len_x), len_y_(len_y) {
+    IDrawable(x0, y0), len_x_(len_x), len_y_(len_y) {
     text_sfml_.setFont(font);
     text_sfml_.setPosition(x0 + 10, y0 + len_y / 2 - letter_size / 2);
     text_sfml_.setCharacterSize(letter_size);
@@ -99,13 +99,9 @@ void InputLine::SetTextColor(sf::Color color) {
     text_sfml_.setFillColor(color);
 }
 
-IDrawable::IDrawable(int x0, int y0) :x0_(x0), y0_(y0) {}
-
-TextLine::TextLine() : WindowObject(0, 0) {}
-
 TextLine::TextLine(int x0, int y0, int len_x, int len_y, std::wstring text,
     sf::Font& font, int letter_size, sf::Color color_outline, 
-    sf::Color color_fill) : WindowObject(x0, y0), 
+    sf::Color color_fill) : IDrawable(x0, y0),
     len_x_(len_x), len_y_(len_y), text_(text) {
     text_sfml_.setFont(font);
     text_sfml_.setString(text);

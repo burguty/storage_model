@@ -2,15 +2,15 @@
 
 bool MainWindow::MainLoop(ModelData* data) {
     sf::RenderWindow window(sf::VideoMode(1650, 900), "Storage");
-    sf::Font font;
-    font.loadFromFile("Data/ArialRegular.ttf");
-
+    sf::Font font_text, font_storage_room;
+    font_text.loadFromFile("Data/ArialRegular.ttf");
+    font_storage_room.loadFromFile("Data/CORBEL.ttf");
     storage = new Storage(data,
         30 + (1150 - 30) / 2 - 425,
         780 - 5 - 350,
-        font);
+        font_storage_room);
     info_field = new InfoField(1170, 30);
-    button_stop = new Button(1170, 784, 250, 50, text_button_stop, font);
+    button_stop = new Button(1170, 784, 250, 50, text_button_stop, font_text);
 
     while (window.isOpen()) {
         sf::Event event;
