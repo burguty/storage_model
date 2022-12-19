@@ -13,9 +13,17 @@ Request::Request(int product_type, int product_count, Shop* customer) :
     IClickable(), IDrawable(-1, -1), 
     product_type_(product_type), product_count_(product_count), 
     customer_(customer) {}
-void Request::draw(sf::RenderWindow& window) {}
-void Request::DrawInformation(sf::RenderWindow& window, int x0, int y0) {}
-int Request::GetVisualizationType() {}
+void Request::draw(sf::RenderWindow& window) {
+    return;
+}
+void Request::DrawInformation(sf::RenderWindow& window,
+    int x0, int y0, sf::Font& font) {
+    window.draw(sf::CircleShape(10));
+    return;
+}
+int Request::GetVisualizationType() {
+    return 2;
+}
 IClickable* Request::Click(int x, int y) { 
     return nullptr;
 }
@@ -31,7 +39,8 @@ Shop::Shop(int x0, int y0, sf::Font& font) :
 void Shop::draw(sf::RenderWindow& window) {
     window.draw(texture_);
 }
-void Shop::DrawInformation(sf::RenderWindow& window, int x0, int y0) {
+void Shop::DrawInformation(sf::RenderWindow& window,
+    int x0, int y0, sf::Font& font) {
     sf::CircleShape circle(10, 50);
     circle.setFillColor(sf::Color::Blue);
     circle.setPosition(x0, y0);

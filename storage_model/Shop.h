@@ -10,7 +10,8 @@ public:
     ~Shop() = default;
 
     virtual void draw(sf::RenderWindow& window);
-    virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0);
+    virtual void DrawInformation(sf::RenderWindow& window,
+        int x0, int y0, sf::Font& font);
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
     Request* MakeRequest(Storage* storage);
@@ -24,7 +25,8 @@ public:
     Request(int product_type, int product_count, Shop* customer);
     virtual ~Request() = default;
     virtual void draw(sf::RenderWindow& window);
-    virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0);
+    virtual void DrawInformation(sf::RenderWindow& window,
+        int x0, int y0, sf::Font& font);
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
 private:
