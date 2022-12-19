@@ -45,8 +45,12 @@ std::wstring GetProductName(int type) {
 }
 
 int shelf_lifes[17] = {3, 2, 5};
-int product_price[17] = {90, 80, 120};
+
+int product_price[17] = { 20, 30, 50, 60, 10, 100,
+200, 150, 300, 250, 140, 420, 260, 780, 960, 150, 120 };
+
 int count_at_box[17] = {20, 20, 10};
+
 int GetCountAtBox(int type) {
     return count_at_box[type];
 }

@@ -158,6 +158,7 @@
     <ClCompile Include="ModelData.cpp" />
     <ClCompile Include="OpenWindow.cpp" />
     <ClCompile Include="Products.cpp" />
+    <ClCompile Include="Shop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Frontend.h" />
@@ -166,6 +167,7 @@
     <ClInclude Include="ModelData.h" />
     <ClInclude Include="OpenWindow.h" />
     <ClInclude Include="Products.h" />
+    <ClInclude Include="Shop.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
