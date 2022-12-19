@@ -14,9 +14,10 @@ protected:
 
 class Button : public IDrawable {
 public:
-    Button(int x0, int y0, int len_x, int len_y, std::wstring& text, sf::Font& font, int letter_size = 24);
+    Button(int x0, int y0, int len_x, int len_y, std::wstring text, sf::Font& font, int letter_size = 24);
     virtual void draw(sf::RenderWindow& window);
     bool Click(int x, int y);
+    void SetText(std::wstring text);
 private:
     int len_x_, len_y_;
     sf::Text text_;
@@ -44,7 +45,7 @@ public:
     void DeleteSymbol();
     void SetStatus(bool status);
     void SetTextColor(sf::Color color);
-    void SetFillColor(sf::Color color);
+    void Clear();
     std::wstring GetText();
 private:
     int len_x_, len_y_;
@@ -68,9 +69,9 @@ public:
         sf::Color color_fill = sf::Color::Transparent);
     virtual void draw(sf::RenderWindow& window);
     bool Click(int x, int y);
+    void SetText(std::wstring text);
 private:
     int len_x_, len_y_;
     sf::RectangleShape line_;
-    std::wstring text_ = L"";
     sf::Text text_sfml_;
 };

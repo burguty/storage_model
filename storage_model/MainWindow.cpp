@@ -9,7 +9,7 @@ bool MainWindow::MainLoop(ModelData* data) {
         30 + (1150 - 30) / 2 - 425,
         780 - 5 - 350 - 10,
         font_storage_room);
-    info_field = new InfoField(1170, 30);
+    info_field = new InfoField(1170, 30, font_text);
     button_stop = new Button(1170, 784, 250, 50, text_button_stop, font_text);
 
     while (window.isOpen()) {
@@ -29,20 +29,22 @@ bool MainWindow::MainLoop(ModelData* data) {
                     ClearMemory();
                     return false;
                 }
+                if (info_field->Click(x, y))
+                    continue;
                 info_field->ChangeMode(storage->Click(x, y));
             }
             if (event.type == sf::Event::TextEntered) {
                 if (event.text.unicode == 8) {
-                    // delete last 
+                    info_field->DeleteSymbol();
                 } else {
-                    // event.text.unicode - символ
+                    info_field->TypeSymbol(event.text.unicode);
                 }
             }
         }
         window.clear(sf::Color(230, 230, 230));
         DrawInterface(window);
         storage->draw(window);
-        info_field->draw(window, font_text);
+        info_field->draw(window);
         button_stop->draw(window);
         window.display();
     }
