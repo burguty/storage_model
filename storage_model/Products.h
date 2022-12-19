@@ -9,10 +9,12 @@ class IProduct {
 public:
     IProduct(int product_type, int price);
     virtual ~IProduct();
-    int GetProductType();
-    int GetPrice();
+    int ProductType();
+    int Price();
+    void GoToTheNextDay();
+    bool IsOverdue();
 protected:
-    int GetRemains();
+    int Remains();
     void ChangePrice(int new_price);
     int product_type_;
 private:
@@ -34,13 +36,12 @@ public:
         int count_at_box, int box_count, int x0, int y0);
 
     int PurchasePrice();
-
     void Reduction(int new_cost);
     int ProductsCount();
     int CalculateRequiredBox(int products_count);
     int CalculateSellingProducts(int products_count);
     int RequestPrice(int products_count);
-    bool Sell(int products_count);
+    bool Sell(int products_count);;
 
     virtual void draw(sf::RenderWindow& window);
     virtual void Move(int x, int y);
@@ -60,13 +61,15 @@ public:
     virtual ~StorageRoom();
 
     void AddDelivery(ProductBatch* batch);
-    std::vector<ProductBatch*> Clearing(int day);
+    std::vector<ProductBatch*> Clearing();
     int RequestPrice(int products_count);
     void ProductShipments(int products_count);
     int ProductsCount();
     int ProductsPrice();
     int ProductsPurchasePrice();
     int SpentOnPurchase();
+    int Profit();
+    void GoToTheNextDay();
 
     virtual void draw(sf::RenderWindow& window);
     virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font);
@@ -76,7 +79,7 @@ private:
     int CalculateXForBatch(int ind = -1);
     int CalculateYForBatch(int ind = -1);
 
-    int product_type_, profit = 0;
+    int product_type_, profit_ = 0;
     std::deque<ProductBatch*>batches_;
     const int width_ = 150, height_ = 90, step_ = 10, in_line_ = 5;
     sf::RectangleShape texture_;
@@ -89,9 +92,13 @@ public:
     virtual ~Storage();
 
     void AddDelivery(ProductBatch* batch);
-    std::vector<ProductBatch*> Clearing(int day);
+    std::vector<ProductBatch*> Clearing();
     int RequestPrice(int product_type, int products_count);
     void ProductShipments(int product_type, int products_count);
+    int SpentOnPurchase();
+    int Profit();
+    int Price();
+    void GoToTheNextDay();
 
     virtual void draw(sf::RenderWindow& window);
     virtual void DrawInformation(sf::RenderWindow& window, 
@@ -100,6 +107,6 @@ public:
     virtual IClickable* Click(int x, int y);
 private:
     StorageRoom* rooms_[17];
-    const int width_ = 1150 - 300, height_ = 350, step_ = 15, in_line_ = 3;
+    const int width_ = 1150 - 300, height_ = 350, step_ = 15, in_line_ = 5;
     sf::RectangleShape texture_;
 };
