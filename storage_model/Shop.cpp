@@ -28,9 +28,17 @@ IClickable* Request::Click(int x, int y) {
     return nullptr;
 }
 
-Shop::Shop(int x0, int y0, sf::Font& font) :
-    IClickable(), IDrawable(x0, y0) {
-    texture_.setPosition(x0, y0);
+int CountX0(int index) {
+    return (1150 + 30) / 2 - 100 / 2 + index * ((1150 - 30 - 7 * 100) / 8);
+}
+
+int CountY0(int index) {
+    return 20 + abs(index) * 40;
+}
+
+Shop::Shop(int index, sf::Font& font) :
+    IClickable(), IDrawable(CountX0(index), CountY0(index)) {
+    texture_.setPosition(CountX0(index), CountY0(index));
     texture_.setFillColor(sf::Color::White);
     texture_.setSize(sf::Vector2f(width_, height_));
     texture_.setOutlineThickness(3);
