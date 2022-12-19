@@ -7,7 +7,7 @@ bool MainWindow::MainLoop(ModelData* data) {
     font_storage_room.loadFromFile("Data/CORBEL.ttf");
     storage = new Storage(data,
         30 + (1150 - 30) / 2 - 425,
-        780 - 5 - 350,
+        780 - 5 - 350 - 10,
         font_storage_room);
     info_field = new InfoField(1170, 30);
     button_stop = new Button(1170, 784, 250, 50, text_button_stop, font_text);
