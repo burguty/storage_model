@@ -138,6 +138,7 @@ void StorageRoom::ProductShipments(int products_count) {
 std::vector<ProductBatch*> StorageRoom::Clearing() {
     std::vector<ProductBatch*> trash;
     while (!batches_.empty() && batches_[0]->IsOverdue()) {
+        profit_ -= batches_[0]->PurchasePrice() * batches_[0]->ProductsCount();
         trash.push_back(batches_[0]);
         batches_.pop_back();
     }

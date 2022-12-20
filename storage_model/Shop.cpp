@@ -28,17 +28,9 @@ IClickable* Request::Click(int x, int y) {
     return nullptr;
 }
 
-int CountX0(int index) {
-    return (1150 + 30) / 2 - 100 / 2 + index * ((1150 - 30 - 7 * 100) / 8);
-}
-
-int CountY0(int index) {
-    return 20 + abs(index) * 40;
-}
-
-Shop::Shop(int index, sf::Font& font) :
-    IClickable(), IDrawable(CountX0(index), CountY0(index)) {
-    texture_.setPosition(CountX0(index), CountY0(index));
+Shop::Shop(int index, sf::Font& font, std::mt19937& gen) :
+    IClickable(), IDrawable(CountX0(index), CountY0(index)), gen_(gen) {
+    texture_.setPosition(x0_, y0_);
     texture_.setFillColor(sf::Color::White);
     texture_.setSize(sf::Vector2f(width_, height_));
     texture_.setOutlineThickness(3);
@@ -63,11 +55,10 @@ IClickable* Shop::Click(int x, int y) {
     return nullptr;
 }
 Request* Shop::MakeRequest(Storage* storage) {
-    std::mt19937 gen(4321);
-    if (gen() % 100 < 30) return nullptr;
+    if (gen_() % 100 < 30) return nullptr;
     std::vector<int> x(17);
     for (int i = 0; i < 17; ++i) {
-        x[i] = gen() % (gaps[i].y - gaps[i].x) + gaps[i].x;
+        x[i] = gen_() % (gaps[i].y - gaps[i].x) + gaps[i].x;
     }
     std::vector<std::pair<int, int>> f(17);
     for (int i = 0; i < 17; ++i) {
@@ -101,7 +92,7 @@ Request* Shop::MakeRequest(Storage* storage) {
     for (int i = size_k - 1; i >= 0; --i) {
         v[i] = v[i + 1] * k[i];
     }
-    long double rand = static_cast<long double>(gen()) / ((1ll << 32) - 1);
+    long double rand = static_cast<long double>(gen_()) / ((1ll << 32) - 1);
     int index = 0;
     long double sum = 0;
     while (index < size_k) {
