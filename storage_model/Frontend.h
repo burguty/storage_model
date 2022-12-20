@@ -18,6 +18,8 @@ public:
     virtual void draw(sf::RenderWindow& window);
     bool Click(int x, int y);
     void SetText(std::wstring text);
+    void SetPosition(int x, int y);
+    void SetSizes(int len_x, int len_y);
 private:
     int len_x_, len_y_;
     sf::Text text_;
@@ -46,6 +48,8 @@ public:
     void SetStatus(bool status);
     void SetTextColor(sf::Color color);
     void Clear();
+    void SetPosition(int x, int y);
+    void SetSizes(int len_x, int len_y);
     std::wstring GetText();
 private:
     int len_x_, len_y_;
@@ -57,9 +61,14 @@ private:
 
 class IMovable : virtual public IDrawable {
 public:
-    IMovable() = default;
+    IMovable();
     virtual ~IMovable() {}
-    virtual void Move(int x, int y) = 0;
+    void StartMoving(int target_x, int target_y, int time);
+    bool Move(long double time_delta);
+private:
+    void Transfer(int x, int y);
+    long double speed_x_, speed_y_, time_sum_;
+    int x_start_, y_start_, target_x_, target_y_, time_;
 };
 
 class TextLine : public IDrawable {

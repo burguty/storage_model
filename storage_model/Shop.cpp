@@ -103,7 +103,7 @@ Request* Shop::MakeRequest(Storage* storage) {
         return nullptr;
     }
     if (size_k == 0) {
-        return new Request(f[0].second, x[f[0].second], this);
+        return new Request(f[16].second, x[f[16].second], this);
     }
 
     std::vector<long double> k(size_k);

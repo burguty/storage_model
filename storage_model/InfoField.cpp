@@ -80,7 +80,7 @@ void InfoField::ChangeMode(IClickable* new_object) {
             button_->SetText(L"Готово");
         }
         if (visualization_type_ == 2) {
-            line_->SetText(L"Введите кол-во опт. упаковок:");
+            line_->SetText(L"Введите кол-во оптовых упаковок:");
             input_line_->Clear();
             input_line_->SetStatus(false);
             button_->SetText(L"Готово");

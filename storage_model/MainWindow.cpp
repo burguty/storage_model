@@ -2,7 +2,7 @@
 
 bool MainWindow::MainLoop(ModelData* data) {
     std::mt19937 gen(0);
-
+    sf::Clock clock;
     sf::RenderWindow window(sf::VideoMode(1650, 900), "Storage");
     sf::Font font_text, font_storage_room;
     font_text.loadFromFile("Data/ArialRegular.ttf");
@@ -21,7 +21,7 @@ bool MainWindow::MainLoop(ModelData* data) {
     button_stop = new Button(1170, 784, 250, 50, text_button_stop, font_text);
     button_create_requests = new Button(30, 800, 220, 50, L"Принять заказы", font_text, 25);
     int day = 0;
-    int condition = 0;
+    condition = 0, next_condition = -1;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -31,6 +31,9 @@ bool MainWindow::MainLoop(ModelData* data) {
                 window.close();
                 ClearMemory();
                 return true;
+            }
+            if (condition == -1) {
+                continue;
             }
             if (event.type == sf::Event::MouseButtonPressed
                 && event.mouseButton.button == sf::Mouse::Left) {
@@ -44,7 +47,7 @@ bool MainWindow::MainLoop(ModelData* data) {
                     if (condition == 3) {
                         deliveries.push_back(requests.back());
                         storage->ProductShipments(requests.back()->GetProductType(),
-                            requests.back()->approved_count_ * GetCountAtBox(requests.back()->GetProductType()));
+                            requests.back()->approved_count_);
                         requests.pop_back();
                         info_field->ChangeMode(GetNextRequest());
                     }
@@ -96,18 +99,46 @@ bool MainWindow::MainLoop(ModelData* data) {
         if (condition == 5) {
             day += 1;
             storage->GoToTheNextDay();
-            for (ProductBatch* batch : storage->Clearing())
-                delete batch;
-            condition = 0;
+            for (ProductBatch* batch : storage->Clearing()) {
+                batch->StartMoving(1000, 1000, 2);
+                on_the_move.push_back(static_cast<IMovable*>(batch));
+            }
+            condition = -1, next_condition = 0;
+        }
+        long double time = clock.restart().asSeconds();
+        if (condition == -1) {
+            UpdateMovableObject(time);
         }
         DrawInterface(window);
         storage->draw(window);
         info_field->draw(window);
         button_stop->draw(window);
+        DrawMovableObject(window);
         for (int i = 0; i < shops.size(); i++) {
             shops[i]->draw(window);
         }
         window.display();
+    }
+}
+
+void MainWindow::DrawMovableObject(sf::RenderWindow& window) {
+    for (IMovable* obj : on_the_move)
+        obj->draw(window);
+}
+
+void MainWindow::UpdateMovableObject(long double time) {
+    if (condition != -1)
+        return;
+    if (on_the_move.empty()) {
+        condition = next_condition;
+        return;
+    }
+    auto it = on_the_move.begin();
+    while (it != on_the_move.end()) {
+        if ((*it)->Move(time))
+            it = on_the_move.erase(it);
+        else
+            ++it;
     }
 }
 
@@ -134,4 +165,7 @@ void MainWindow::ClearMemory() {
     delete info_field;
     delete button_stop;
     delete button_create_requests;
+    for (IMovable* movable : on_the_move) {
+        delete movable;
+    }
 }

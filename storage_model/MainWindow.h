@@ -11,6 +11,8 @@ public:
 private:
     void DrawInterface(sf::RenderWindow& window);
     void ClearMemory();
+    void UpdateMovableObject(long double time);
+    void DrawMovableObject(sf::RenderWindow& window);
     Request* GetNextRequest();
     std::wstring text_button_stop = L"Остановить модель";
     Storage* storage;
@@ -20,4 +22,6 @@ private:
     std::vector<Shop*>shops;
     std::vector<Request*>requests;
     std::vector<Request*>deliveries;
+    std::deque<IMovable*>on_the_move;
+    int condition = 0, next_condition = -1;
 };

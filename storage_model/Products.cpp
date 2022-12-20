@@ -27,10 +27,9 @@ void IProduct::GoToTheNextDay() {
 
 // ProductBatch
 ProductBatch::ProductBatch(int product_type, int price, int purchase_price,
-    int count_at_box, int box_count, int x0, int y0):
-    IProduct(product_type, price), IDrawable(x0, y0), 
-    count_at_box_(count_at_box), box_count_(box_count), purchase_price_(purchase_price){
-    texture_.setPosition(x0, y0);
+    int count_at_box, int box_count, int x0, int y0) :
+    IProduct(product_type, price), IDrawable(x0, y0),
+    count_at_box_(count_at_box), box_count_(box_count), purchase_price_(purchase_price) {
     texture_.setOutlineThickness(3);
     texture_.setOutlineColor(sf::Color(0, 0, 0, 150));
     texture_.setSize(sf::Vector2f(width, height));
@@ -81,6 +80,7 @@ void ProductBatch::draw(sf::RenderWindow& window) {
     }
     else
         texture_.setFillColor(sf::Color(0, 255, 0, 120));
+    texture_.setPosition(x0_, y0_);
     window.draw(texture_);
     }
 void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
@@ -277,8 +277,8 @@ void Storage::AddDelivery(ProductBatch* batch) {
 int Storage::RequestPrice(int product_type, int products_count) {
     return rooms_[product_type]->RequestPrice(products_count);
 }
-void Storage::ProductShipments(int product_type, int products_count) {
-    rooms_[product_type]->ProductShipments(products_count);
+void Storage::ProductShipments(int product_type, int box_count) {
+    rooms_[product_type]->ProductShipments(box_count);
 }
 int Storage::Profit() {
     int profit = 0;

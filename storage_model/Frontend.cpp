@@ -26,6 +26,12 @@ void Button::draw(sf::RenderWindow& window) {
 void Button::SetText(std::wstring text) {
     text_.setString(text);
 }
+void Button::SetPosition(int x, int y) {
+    x0_ = x, y0_ = y;
+}
+void Button::SetSizes(int len_x, int len_y) {
+    len_x_ = len_x, len_y_ = len_y;
+}
 
 CheckBox::CheckBox(int x0, int y0, int len_x, int len_y) :
     IDrawable(x0, y0), len_x_(len_x), len_y_(len_y) {
@@ -96,11 +102,15 @@ void InputLine::DeleteSymbol() {
 void InputLine::Clear() {
     text_ = L"";
 }
-
+void InputLine::SetPosition(int x, int y) {
+    x0_ = x, y0_ = y;
+}
+void InputLine::SetSizes(int len_x, int len_y) {
+    len_x_ = len_x, len_y_ = len_y;
+}
 void InputLine::SetStatus(bool status) {
     status_ = status;
 }
-
 void InputLine::SetTextColor(sf::Color color) {
     text_sfml_.setFillColor(color);
 }
@@ -120,16 +130,39 @@ TextLine::TextLine(int x0, int y0, int len_x, int len_y, std::wstring text,
     line_.setPosition(x0, y0);
     line_.setSize(sf::Vector2f(len_x, len_y));
 }
-
 void TextLine::draw(sf::RenderWindow& window) {
     window.draw(line_);
     window.draw(text_sfml_);
 }
-
 bool TextLine::Click(int x, int y) {
     return x0_ <= x && x <= x0_ + len_x_ && y0_ <= y && y <= y0_ + len_y_;
 }
-
 void TextLine::SetText(std::wstring text) {
     text_sfml_.setString(text);
+}
+
+IMovable::IMovable() {}
+void IMovable::StartMoving(int target_x, int target_y, int time) {
+    target_x_ = target_x;
+    target_y_ = target_y_;
+    x_start_ = x0_;
+    y_start_ = y0_;
+    time_ = time;
+    time_sum_ = 0;
+    speed_x_ = static_cast<long double>(target_x - x0_) / time_;
+    speed_y_ = static_cast<long double>(target_y - y0_) / time_;
+}
+bool IMovable::Move(long double time_delta) {
+    time_sum_ += time_delta;
+    if (time_sum_ >= time_) {
+        Transfer(target_x_, target_y_);
+        return true;
+    }
+    Transfer(x_start_ + speed_x_ * time_sum_,
+        y_start_ + speed_y_ * time_sum_);
+    return false;
+}
+void IMovable::Transfer(int x, int y) {
+    x0_ = x;
+    y0_ = y;
 }
