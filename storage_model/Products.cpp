@@ -122,7 +122,8 @@ void StorageRoom::AddDelivery(ProductBatch* batch) {
     batch->Move(CalculateXForBatch(), CalculateYForBatch());
     batches_.push_back(batch);
 }
-void StorageRoom::ProductShipments(int products_count) {
+void StorageRoom::ProductShipments(int box_count) {
+    int products_count = GetCountAtBox(product_type_) * box_count;
     while (!batches_.empty() && products_count > 0) {
         int count = batches_[0]->CalculateSellingProducts(products_count);
         if (batches_[0]->Sell(count)) {
@@ -335,4 +336,10 @@ void Storage::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font
     name.setPosition(x0 + 5, y0 + 5);
     name.setFillColor(sf::Color::Black);
     window.draw(name);
+}
+bool Storage::IsProductUsing(int product_type) {
+    return rooms_[product_type] != nullptr;
+}
+int Storage::ProductsCount(int product_type) {
+    return rooms_[product_type]->ProductsCount();
 }

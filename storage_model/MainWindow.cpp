@@ -17,7 +17,7 @@ bool MainWindow::MainLoop(ModelData* data) {
         30 + (1150 - 30) / 2 - 425,
         780 - 5 - 350 - 10,
         font_storage_room);
-    info_field = new InfoField(1170, 30, font_text);
+    info_field = new InfoField(storage, 1170, 30, font_text);
     button_stop = new Button(1170, 784, 250, 50, text_button_stop, font_text);
     button_create_requests = new Button(30, 800, 220, 50, L"Принять заказы", font_text, 25);
     int day = 0;
@@ -43,6 +43,8 @@ bool MainWindow::MainLoop(ModelData* data) {
                 if (info_field->Click(x, y)) {
                     if (condition == 3) {
                         deliveries.push_back(requests.back());
+                        storage->ProductShipments(requests.back()->GetProductType(),
+                            requests.back()->approved_count_ * GetCountAtBox(requests.back()->GetProductType()));
                         requests.pop_back();
                         info_field->ChangeMode(GetNextRequest());
                     }

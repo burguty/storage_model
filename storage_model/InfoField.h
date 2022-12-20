@@ -1,10 +1,11 @@
 #pragma once
 #include "Products.h"
 #include "ModelData.h"
+#include "Shop.h"
 
 class InfoField {
 public:
-    InfoField(int x0, int y0, sf::Font& font);
+    InfoField(Storage* storage, int x0, int y0, sf::Font& font);
     ~InfoField();
     void ChangeMode(IClickable* new_object);
     virtual void draw(sf::RenderWindow& window);
@@ -12,6 +13,8 @@ public:
     void TypeSymbol(char c);
     void DeleteSymbol();
 private:
+    Storage* storage_;
+
     int x0_, y0_;
     int visualization_type_ = -1;
     const int width_ = 1640 - 1170, height_ = 400;

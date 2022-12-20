@@ -16,12 +16,8 @@ public:
     virtual IClickable* Click(int x, int y);
     Request* MakeRequest(Storage* storage);
 private:
-    int CountX0(int index) {
-        return (1150 + 30) / 2 - 100 / 2 + index * ((1150 - 30 - 7 * 100) / 4);
-    }
-    int CountY0(int index) {
-        return 20 + abs(index) * 50;
-    }
+    int CountX0(int index);
+    int CountY0(int index);
     std::mt19937& gen_;
     const int width_ = 100, height_ = 100;
     sf::RectangleShape texture_;
@@ -36,8 +32,14 @@ public:
         int x0, int y0, sf::Font& font);
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
+    int approved_count_ = 0;
+    int GetProductType();
+    void RecalculateProfitAndApprovedCount(Storage* storage, int approved_count);
+    void RecalculateProductCount(Storage* storage);
 private:
+    int profit = 0;
     int product_type_;
     int product_count_;
+    std::wstring name_;
     Shop* customer_;
 };

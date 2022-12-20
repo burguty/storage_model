@@ -41,7 +41,7 @@ public:
     int CalculateRequiredBox(int products_count);
     int CalculateSellingProducts(int products_count);
     int RequestPrice(int products_count);
-    bool Sell(int products_count);;
+    bool Sell(int products_count);
 
     virtual void draw(sf::RenderWindow& window);
     virtual void Move(int x, int y);
@@ -99,6 +99,8 @@ public:
     int Profit();
     int Price();
     void GoToTheNextDay();
+    bool IsProductUsing(int product_type);
+    int ProductsCount(int product_type);
 
     virtual void draw(sf::RenderWindow& window);
     virtual void DrawInformation(sf::RenderWindow& window, 
