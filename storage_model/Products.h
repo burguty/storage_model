@@ -13,10 +13,12 @@ public:
     int Price();
     void GoToTheNextDay();
     bool IsOverdue();
+    void SetColor(sf::Color color);
 protected:
     int Remains();
     void ChangePrice(int new_price);
     int product_type_;
+    sf::Color back_color_;
 private:
     int price_, remains_;
 };
@@ -43,8 +45,8 @@ public:
     int RequestPrice(int products_count);
     bool Sell(int products_count);
 
+    void Move(int x, int y);
     virtual void draw(sf::RenderWindow& window);
-    virtual void Move(int x, int y);
     virtual void DrawInformation(sf::RenderWindow& window, 
         int x0, int y0, sf::Font& font);
     virtual int GetVisualizationType();
@@ -63,7 +65,7 @@ public:
     void AddDelivery(ProductBatch* batch);
     std::vector<ProductBatch*> Clearing();
     int RequestPrice(int products_count);
-    void ProductShipments(int products_count);
+    std::vector<ProductBatch*> ProductShipments(int box_count);
     int ProductsCount();
     int ProductsPrice();
     int ProductsPurchasePrice();
@@ -94,7 +96,7 @@ public:
     void AddDelivery(ProductBatch* batch);
     std::vector<ProductBatch*> Clearing();
     int RequestPrice(int product_type, int products_count);
-    void ProductShipments(int product_type, int products_count);
+    std::vector<ProductBatch*> ProductShipments(int product_type, int box_count);
     int SpentOnPurchase();
     int Profit();
     int Price();

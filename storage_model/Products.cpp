@@ -4,6 +4,15 @@
 IProduct::IProduct(int product_type, int price) :
     product_type_(product_type), price_(price) {
     remains_ = GetShelfLife(product_type);
+    if (remains_ <= 2) {
+        if (remains_ <= 0) {
+            back_color_ = sf::Color(0, 0, 0, 120);
+        } else {
+            back_color_ = sf::Color(255, 0, 0, 120);
+        }
+    } else {
+        back_color_ = sf::Color(0, 255, 0, 120);
+    }
 }
 IProduct::~IProduct() {}
 int IProduct::Price() {
@@ -23,6 +32,18 @@ bool IProduct::IsOverdue() {
 }
 void IProduct::GoToTheNextDay() {
     remains_--;
+    if (remains_ <= 2) {
+        if (remains_ <= 0) {
+            back_color_ = sf::Color(0, 0, 0, 120);
+        } else {
+            back_color_ = sf::Color(255, 0, 0, 120);
+        }
+    } else {
+        back_color_ = sf::Color(0, 255, 0, 120);
+    }
+}
+void IProduct::SetColor(sf::Color color) {
+    back_color_ = color;
 }
 
 // ProductBatch
@@ -58,11 +79,6 @@ int ProductBatch::ProductsCount() {
 int ProductBatch::PurchasePrice() {
     return purchase_price_;
 }
-void ProductBatch::Move(int x, int y) {
-    x0_ = x;
-    y0_ = y;
-    texture_.setPosition(sf::Vector2f(x0_, y0_));
-}
 int ProductBatch::GetVisualizationType() {
     return 1;
 }
@@ -72,17 +88,10 @@ IClickable* ProductBatch::Click(int x, int y) {
     return nullptr;
 }
 void ProductBatch::draw(sf::RenderWindow& window) {
-    if (Remains() <= 2) {
-        if (Remains() <= 0)
-            texture_.setFillColor(sf::Color(0, 0, 0, 120));
-        else
-            texture_.setFillColor(sf::Color(255, 0, 0, 120));
-    }
-    else
-        texture_.setFillColor(sf::Color(0, 255, 0, 120));
     texture_.setPosition(x0_, y0_);
+    texture_.setFillColor(back_color_);
     window.draw(texture_);
-    }
+}
 void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
     sf::Text name(L"Партия товара \"" + GetProductName(product_type_) + L"\"" +
         L"\nКоличество в партии - " + IntToString(count_at_box_ * box_count_) + L" шт." +
@@ -94,6 +103,9 @@ void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf:
     name.setPosition(x0 + 5, y0 + 5);
     name.setFillColor(sf::Color::Black);
     window.draw(name);
+}
+void ProductBatch::Move(int x, int y) {
+    x0_ = x, y0_ = y;
 }
 
 // StorageRoom
@@ -122,19 +134,26 @@ void StorageRoom::AddDelivery(ProductBatch* batch) {
     batch->Move(CalculateXForBatch(), CalculateYForBatch());
     batches_.push_back(batch);
 }
-void StorageRoom::ProductShipments(int box_count) {
+std::vector<ProductBatch*> StorageRoom::ProductShipments(int box_count) {
     int products_count = GetCountAtBox(product_type_) * box_count;
+    std::vector<ProductBatch*>result;
     while (!batches_.empty() && products_count > 0) {
         int count = batches_[0]->CalculateSellingProducts(products_count);
         if (batches_[0]->Sell(count)) {
-            delete batches_[0];
+            result.push_back(batches_[0]);
             batches_.pop_front();
+        } else {
+            result.push_back(new ProductBatch(product_type_,
+                batches_[0]->Price(), batches_[0]->PurchasePrice(),
+                GetCountAtBox(product_type_), 
+                count / GetCountAtBox(product_type_), x0_, y0_));
         }
         products_count -= count;
     }
     for (int i = 0; i < batches_.size(); i++) {
         batches_[i]->Move(CalculateXForBatch(i), CalculateYForBatch(i));
     }
+    return result;
 }
 std::vector<ProductBatch*> StorageRoom::Clearing() {
     std::vector<ProductBatch*> trash;
@@ -277,8 +296,8 @@ void Storage::AddDelivery(ProductBatch* batch) {
 int Storage::RequestPrice(int product_type, int products_count) {
     return rooms_[product_type]->RequestPrice(products_count);
 }
-void Storage::ProductShipments(int product_type, int box_count) {
-    rooms_[product_type]->ProductShipments(box_count);
+std::vector<ProductBatch*> Storage::ProductShipments(int product_type, int box_count) {
+    return rooms_[product_type]->ProductShipments(box_count);
 }
 int Storage::Profit() {
     int profit = 0;

@@ -45,19 +45,25 @@ void Request::RecalculateProfitAndApprovedCount(Storage* storage, int approved_c
 void Request::RecalculateProductCount(Storage* storage) {
     product_count_ = std::min(product_count_, storage->ProductsCount(product_type_));
 }
+int Request::GetTargetX() {
+    return customer_->GetX0();
+}
+int Request::GetTargetY() {
+    return customer_->GetY0();
+}
 
 Shop::Shop(int index, sf::Font& font, std::mt19937& gen) :
-    IClickable(), IDrawable(CountX0(index), CountY0(index)), gen_(gen) {
+    IClickable(), IDrawable(CalculateX0(index), CalculateY0(index)), gen_(gen) {
     texture_.setPosition(x0_, y0_);
     texture_.setFillColor(sf::Color::White);
     texture_.setSize(sf::Vector2f(width_, height_));
     texture_.setOutlineThickness(3);
     texture_.setOutlineColor(sf::Color::Black);
 }
-int Shop::CountX0(int index) {
+int Shop::CalculateX0(int index) {
     return (1150 + 30) / 2 - 100 / 2 + index * ((1150 - 30 - 7 * 100) / 8) + index * 100;
 }
-int Shop::CountY0(int index) {
+int Shop::CalculateY0(int index) {
     return 30 + 5 + abs(index) * 40;
 }
 void Shop::draw(sf::RenderWindow& window) {
@@ -132,4 +138,10 @@ Request* Shop::MakeRequest(Storage* storage) {
     }
     int type = f[17 - index - 1 - 1].second;
     return new Request(type, x[type], this);
+}
+int Shop::GetX0() {
+    return x0_;
+}
+int Shop::GetY0() {
+    return y0_;
 }

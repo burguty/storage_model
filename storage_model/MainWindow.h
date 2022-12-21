@@ -11,7 +11,8 @@ public:
 private:
     void DrawInterface(sf::RenderWindow& window);
     void ClearMemory();
-    void UpdateMovableObject(long double time);
+    void ClearStorage();
+    void SendProducts();
     void DrawMovableObject(sf::RenderWindow& window);
     Request* GetNextRequest();
     std::wstring text_button_stop = L"Остановить модель";

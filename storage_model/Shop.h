@@ -15,9 +15,11 @@ public:
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
     Request* MakeRequest(Storage* storage);
+    int GetX0();
+    int GetY0();
 private:
-    int CountX0(int index);
-    int CountY0(int index);
+    int CalculateX0(int index);
+    int CalculateY0(int index);
     std::mt19937& gen_;
     const int width_ = 100, height_ = 100;
     sf::RectangleShape texture_;
@@ -36,6 +38,8 @@ public:
     int GetProductType();
     void RecalculateProfitAndApprovedCount(Storage* storage, int approved_count);
     void RecalculateProductCount(Storage* storage);
+    int GetTargetX();
+    int GetTargetY();
 private:
     int profit = 0;
     int product_type_;

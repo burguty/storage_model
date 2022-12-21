@@ -46,8 +46,6 @@ bool MainWindow::MainLoop(ModelData* data) {
                 if (info_field->Click(x, y)) {
                     if (condition == 3) {
                         deliveries.push_back(requests.back());
-                        storage->ProductShipments(requests.back()->GetProductType(),
-                            requests.back()->approved_count_);
                         requests.pop_back();
                         info_field->ChangeMode(GetNextRequest());
                     }
@@ -75,9 +73,21 @@ bool MainWindow::MainLoop(ModelData* data) {
             }
         }
         window.clear(sf::Color(230, 230, 230));
-        // развоз
+        long double time = clock.restart().asSeconds();
+        // Анимация развоза товаров
         if (condition == 0) {
-            condition = 1;
+            if (!on_the_move.empty()) {
+                auto it = on_the_move.begin();
+                while (it != on_the_move.end()) {
+                    if ((*it)->Move(time)) {
+                        delete (*it);
+                        it = on_the_move.erase(it);
+                    } else
+                        ++it;
+                }
+            } else {
+                condition = 1;
+            }
         }
         // завоз
         if (condition == 1) {
@@ -96,18 +106,29 @@ bool MainWindow::MainLoop(ModelData* data) {
         if (condition == 4) {
             condition = 5;
         }
+        // +1 день и вывоз просрочки
         if (condition == 5) {
             day += 1;
             storage->GoToTheNextDay();
-            for (ProductBatch* batch : storage->Clearing()) {
-                batch->StartMoving(1000, 1000, 2);
-                on_the_move.push_back(static_cast<IMovable*>(batch));
-            }
-            condition = -1, next_condition = 0;
+            ClearStorage();
+            condition = 6;
         }
-        long double time = clock.restart().asSeconds();
-        if (condition == -1) {
-            UpdateMovableObject(time);
+        // Анимация удаления
+        if (condition == 6) {
+            if (!on_the_move.empty()) {
+                auto it = on_the_move.begin();
+                while (it != on_the_move.end()) {
+                    if ((*it)->Move(time)) {
+                        delete (*it);
+                        it = on_the_move.erase(it);
+                    }
+                    else
+                        ++it;
+                }
+            } else {
+                condition = 0;
+                SendProducts();
+            }
         }
         DrawInterface(window);
         storage->draw(window);
@@ -121,25 +142,32 @@ bool MainWindow::MainLoop(ModelData* data) {
     }
 }
 
+void MainWindow::ClearStorage() {
+    std::vector<ProductBatch*>trash = storage->Clearing();
+    for (ProductBatch* batch : trash) {
+        batch->StartMoving(1000, 1000, 2);
+        on_the_move.push_back(static_cast<IMovable*>(batch));
+    }
+}
+
+void MainWindow::SendProducts() {
+    for (Request* delivery : deliveries) {
+        int product_type = delivery->GetProductType();
+        for (ProductBatch* batch : storage->ProductShipments(product_type, delivery->approved_count_)) {
+            batch->SetColor(sf::Color(0, 191, 255, 120));
+            batch->StartMoving(delivery->GetTargetX(), delivery->GetTargetY(), 2);
+            on_the_move.push_back(static_cast<IMovable*>(batch));
+        }
+    }
+    while (!deliveries.empty()) {
+        delete deliveries.back();
+        deliveries.pop_back();
+    }
+}
+
 void MainWindow::DrawMovableObject(sf::RenderWindow& window) {
     for (IMovable* obj : on_the_move)
         obj->draw(window);
-}
-
-void MainWindow::UpdateMovableObject(long double time) {
-    if (condition != -1)
-        return;
-    if (on_the_move.empty()) {
-        condition = next_condition;
-        return;
-    }
-    auto it = on_the_move.begin();
-    while (it != on_the_move.end()) {
-        if ((*it)->Move(time))
-            it = on_the_move.erase(it);
-        else
-            ++it;
-    }
 }
 
 Request* MainWindow::GetNextRequest() {
