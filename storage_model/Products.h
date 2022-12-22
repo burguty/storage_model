@@ -44,6 +44,7 @@ public:
     int CalculateSellingProducts(int products_count);
     int RequestPrice(int products_count);
     bool Sell(int products_count);
+    int BoxCount();
 
     void Move(int x, int y);
     virtual void draw(sf::RenderWindow& window);
@@ -71,7 +72,14 @@ public:
     int ProductsPurchasePrice();
     int SpentOnPurchase();
     int Profit();
+    int BoxCount();
+    void StartPurchasePhase(int purchase_price);
+    void StopPurchasePhase();
     void GoToTheNextDay();
+    void SetOrderCount(int count);
+    bool IsOrderCountCorrect();
+    bool IsOrderCountCorrect(int order_count);
+    int GetOrderCount();
 
     virtual void draw(sf::RenderWindow& window);
     virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font);
@@ -81,8 +89,13 @@ private:
     int CalculateXForBatch(int ind = -1);
     int CalculateYForBatch(int ind = -1);
 
-    int product_type_, profit_ = 0;
+    int mode_ = 0;
+    int order_count_ = 0, purchase_price_;
+    int max_box_count_;
+
+    int product_type_, count_at_box_, profit_ = 0;
     std::deque<ProductBatch*>batches_;
+
     const int width_ = 150, height_ = 90, step_ = 10, in_line_ = 5;
     sf::RectangleShape texture_;
     sf::Text back_text_;
@@ -103,6 +116,9 @@ public:
     void GoToTheNextDay();
     bool IsProductUsing(int product_type);
     int ProductsCount(int product_type);
+    void StartPurchasePhase();
+    void StopPurchasePhase();
+    bool IsOrderCountsCorrect();
 
     virtual void draw(sf::RenderWindow& window);
     virtual void DrawInformation(sf::RenderWindow& window, 
@@ -110,6 +126,7 @@ public:
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
 private:
+    int mode_ = 0;
     StorageRoom* rooms_[17];
     const int width_ = 1150 - 300, height_ = 350, step_ = 15, in_line_ = 5;
     sf::RectangleShape texture_;

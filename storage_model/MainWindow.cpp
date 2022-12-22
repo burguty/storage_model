@@ -18,10 +18,11 @@ bool MainWindow::MainLoop(ModelData* data) {
         780 - 5 - 350 - 10,
         font_storage_room);
     info_field = new InfoField(storage, 1170, 30, font_text);
-    button_stop = new Button(1170, 784, 250, 50, text_button_stop, font_text);
+    button_stop = new Button(1170, 784, 250, 50, L"ќстановить модель", font_text);
+    button_order = new Button(30, 800, 220, 50, L"«аказать", font_text);
     button_create_requests = new Button(30, 800, 220, 50, L"ѕрин€ть заказы", font_text, 25);
     int day = 0;
-    condition = 0, next_condition = -1;
+    condition = 0;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -51,6 +52,16 @@ bool MainWindow::MainLoop(ModelData* data) {
                     }
                     continue;
                 }
+                if (condition == 4) {
+                    if (button_order->Click(x, y)) {
+                        if (storage->IsOrderCountsCorrect()) {
+                            info_field->ChangeMode(nullptr);
+                            storage->StopPurchasePhase();
+                            condition = 5;
+                        }
+                        continue;
+                    }
+                }
                 if (condition == 2) {
                     if (button_create_requests->Click(x, y)) {
                         condition = 3;
@@ -61,12 +72,12 @@ bool MainWindow::MainLoop(ModelData* data) {
                         info_field->ChangeMode(GetNextRequest());
                         continue;
                     }
-                    info_field->ChangeMode(storage->Click(x, y));
                 }
+                info_field->ChangeMode(storage->Click(x, y));
             }
             if (event.type == sf::Event::TextEntered) {
                 if (event.text.unicode == 8) {
-                    info_field->DeleteSymbol();
+                    info_field->TypeSymbol();
                 } else {
                     info_field->TypeSymbol(event.text.unicode);
                 }
@@ -89,7 +100,7 @@ bool MainWindow::MainLoop(ModelData* data) {
                 condition = 1;
             }
         }
-        // завоз
+        // анимаци€ завоза
         if (condition == 1) {
             condition = 2;
         }
@@ -99,12 +110,14 @@ bool MainWindow::MainLoop(ModelData* data) {
         }
         // обработка заказов
         if (condition == 3) {
-            if (requests.empty())
+            if (requests.empty()) {
                 condition = 4;
+                storage->StartPurchasePhase();
+            }
         }
         // заказ новых товаров
         if (condition == 4) {
-            condition = 5;
+            button_order->draw(window);
         }
         // +1 день и вывоз просрочки
         if (condition == 5) {

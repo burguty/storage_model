@@ -51,6 +51,7 @@ public:
     void SetPosition(int x, int y);
     void SetSizes(int len_x, int len_y);
     std::wstring GetText();
+    void SetText(std::wstring text);
 private:
     int len_x_, len_y_;
     std::wstring text_ = L"1";

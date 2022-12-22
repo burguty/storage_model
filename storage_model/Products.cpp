@@ -76,6 +76,9 @@ bool ProductBatch::Sell(int products_count) {
 int ProductBatch::ProductsCount() {
     return box_count_ * count_at_box_;
 }
+int ProductBatch::BoxCount() {
+    return box_count_;
+}
 int ProductBatch::PurchasePrice() {
     return purchase_price_;
 }
@@ -93,16 +96,16 @@ void ProductBatch::draw(sf::RenderWindow& window) {
     window.draw(texture_);
 }
 void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
-    sf::Text name(L"Партия товара \"" + GetProductName(product_type_) + L"\"" +
+    sf::Text information(L"Партия товара \"" + GetProductName(product_type_) + L"\"" +
         L"\nКоличество в партии - " + IntToString(count_at_box_ * box_count_) + L" шт." +
         L"\nСрок годности - " + IntToString(Remains()) + L" дней" +
         L"\nЦена за шт. - " + IntToString(Price()) + L" руб." +
         L"\nЗакупочная цена за шт. - " + IntToString(purchase_price_) + L" руб." +
         L"\nСтоимость партии - " + IntToString(Price() * count_at_box_ * box_count_) + L" руб.",
         font, 24);
-    name.setPosition(x0 + 5, y0 + 5);
-    name.setFillColor(sf::Color::Black);
-    window.draw(name);
+    information.setPosition(x0 + 5, y0 + 5);
+    information.setFillColor(sf::Color::Black);
+    window.draw(information);
 }
 void ProductBatch::Move(int x, int y) {
     x0_ = x, y0_ = y;
@@ -110,7 +113,9 @@ void ProductBatch::Move(int x, int y) {
 
 // StorageRoom
 StorageRoom::StorageRoom(int product_type, int x0, int y0, sf::Font& font) :
-    IDrawable(x0, y0), product_type_(product_type) {
+    IDrawable(x0, y0), product_type_(product_type), 
+    count_at_box_(GetCountAtBox(product_type)),
+    max_box_count_(GetMaxBoxCount(product_type)) {
     texture_.setPosition(x0, y0);
     texture_.setFillColor(sf::Color::White);
     texture_.setSize(sf::Vector2f(width_, height_));
@@ -121,7 +126,7 @@ StorageRoom::StorageRoom(int product_type, int x0, int y0, sf::Font& font) :
     back_text_.setString(GetProductName(product_type));
     back_text_.setStyle(sf::Text::Bold);
     back_text_.setCharacterSize(26);
-    back_text_.setPosition(x0 + 10, y0 + 10);
+    back_text_.setPosition(x0 + 10, y0 + 5);
     back_text_.setFillColor(sf::Color(0, 191, 255, 255));
 }
 StorageRoom::~StorageRoom() {
@@ -211,19 +216,50 @@ int StorageRoom::SpentOnPurchase() {
 int StorageRoom::Profit() {
     return profit_;
 }
+int StorageRoom::BoxCount() {
+    int result = 0;
+    for (ProductBatch* batch : batches_)
+        result += batch->ProductsCount();
+    return result;
+}
 void StorageRoom::GoToTheNextDay() {
     for (ProductBatch* batch : batches_)
         batch->GoToTheNextDay();
 }
+void StorageRoom::StartPurchasePhase(int purchase_price) {
+    mode_ = 1;
+    order_count_ = 0;
+    purchase_price_ = purchase_price;
+}
+void StorageRoom::StopPurchasePhase() {
+    mode_ = 0;
+}
+bool StorageRoom::IsOrderCountCorrect() {
+    return max_box_count_ >= BoxCount() + order_count_;
+}
+bool StorageRoom::IsOrderCountCorrect(int order_count) {
+    return max_box_count_ >= BoxCount() + order_count;
+}
+int StorageRoom::GetOrderCount() {
+    return order_count_;
+}
+void StorageRoom::SetOrderCount(int count) {
+    order_count_ = count;
+}
 
 int StorageRoom::GetVisualizationType() {
-    return 0;
+    if (mode_ == 0) {
+        return 0;
+    }
+    return 3;
 }
 IClickable* StorageRoom::Click(int x, int y) {
-    for (auto batch : batches_) {
-        IClickable* result = batch->Click(x, y);
-        if (result != nullptr)
-            return result;
+    if (mode_ == 0) {
+        for (auto batch : batches_) {
+            IClickable* result = batch->Click(x, y);
+            if (result != nullptr)
+                return result;
+        }
     }
     if (x0_ <= x && x <= x0_ + width_ && y0_ <= y && y <= y0_ + height_)
         return static_cast<IClickable*>(this);
@@ -232,20 +268,51 @@ IClickable* StorageRoom::Click(int x, int y) {
 void StorageRoom::draw(sf::RenderWindow& window) {
     window.draw(texture_);
     window.draw(back_text_);
-    for (auto product_batch : batches_)
-        product_batch->draw(window);
+    if (mode_ == 0) {
+        for (auto product_batch : batches_)
+            product_batch->draw(window);
+    } else {
+        sf::Text box_count(L"Заказано " + IntToString(order_count_), *back_text_.getFont(), 26);
+        box_count.setStyle(sf::Text::Bold);
+        box_count.setPosition(x0_ + 10, y0_ + 5 + 26 + 5);
+        box_count.setFillColor(IsOrderCountCorrect() ?
+            sf::Color(0, 141, 205, 255) : sf::Color(185, 41, 105));
+        window.draw(box_count);
+    }
 }
 void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
-    sf::Text name(L"Склад товара \"" + GetProductName(product_type_) + L"\"" +
-        L"\nКоличество партий - " + IntToString(batches_.size()) + L" шт." +
-        L"\nКоличество товаров - " + IntToString(ProductsCount()) + L" шт." +
-        L"\nОбщая цена товаров - " + IntToString(ProductsPrice()) + L" руб." +
-        L"\nПрибыль от проданных товаров - " + IntToString(profit_) + L" руб." +
-        L"\nЧистая прибыль - " + IntToString(profit_ - SpentOnPurchase()) + L" руб.",
-        font, 24);
-    name.setPosition(x0 + 5, y0 + 5);
-    name.setFillColor(sf::Color::Black);
-    window.draw(name);
+    sf::Text information;
+    if (mode_ == 0) {
+        information.setString(L"Склад товара \"" + GetProductName(product_type_) + L"\"" +
+            L"\nКоличество партий - " + IntToString(batches_.size()) + L" шт." +
+            L"\nКоличество товаров - " + IntToString(ProductsCount()) + L" шт." +
+            L"\nОбщая цена товаров - " + IntToString(ProductsPrice()) + L" руб." +
+            L"\nПрибыль от проданных товаров - " + IntToString(profit_) + L" руб." +
+            L"\nЧистая прибыль - " + IntToString(profit_ - SpentOnPurchase()) + L" руб."
+            );
+        information.setCharacterSize(24);
+        information.setFillColor(sf::Color::Black);
+    } else {
+        int box_count_in_room = BoxCount();
+        if (max_box_count_ - box_count_in_room < order_count_) {
+            information.setString(GetProductName(product_type_) +
+                L"\nДоступно для заказа - " + IntToString(max_box_count_ - box_count_in_room) + L" шт."
+            );
+            information.setFillColor(sf::Color::Red);
+            information.setCharacterSize(24);
+        } else {
+            information.setString(GetProductName(product_type_) +
+                L"\nДоступно для заказа - " + IntToString(max_box_count_ - box_count_in_room) + L" шт." +
+                L"\nЗаполнено с учетом заказа на " + IntToString((box_count_in_room + order_count_) * 100 / max_box_count_) + L"%" +
+                L"\nСтоимость заказа - " + IntToString(order_count_ * count_at_box_ * purchase_price_) + L" руб."
+            );
+            information.setFillColor(sf::Color::Black);
+            information.setCharacterSize(20);
+        }
+    }
+    information.setFont(font);
+    information.setPosition(x0 + 5, y0 + 5);
+    window.draw(information);
 }
 
 // Storage
@@ -343,22 +410,44 @@ IClickable* Storage::Click(int x, int y) {
         if (result != nullptr)
             return result;
     }
-    if (x0_ <= x && x <= x0_ + width_ && y0_ <= y && y <= y0_ + height_)
+    if (mode_ == 0 && x0_ <= x && x <= x0_ + width_ && y0_ <= y && y <= y0_ + height_)
         return static_cast<IClickable*>(this);
     return nullptr;
 }
 void Storage::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
-    sf::Text name(L"Склад\nОбщая цена товаров - " + IntToString(Price()) + L" руб." +
+    sf::Text information(L"Склад\nОбщая цена товаров - " + IntToString(Price()) + L" руб." +
         L"\nПрибыль от проданных товаров - " + IntToString(Profit()) + L" руб." +
         L"\nЧистая прибыль - " + IntToString(Profit() - SpentOnPurchase()) + L" руб.",
         font, 24);
-    name.setPosition(x0 + 5, y0 + 5);
-    name.setFillColor(sf::Color::Black);
-    window.draw(name);
+    information.setPosition(x0 + 5, y0 + 5);
+    information.setFillColor(sf::Color::Black);
+    window.draw(information);
 }
 bool Storage::IsProductUsing(int product_type) {
     return rooms_[product_type] != nullptr;
 }
 int Storage::ProductsCount(int product_type) {
     return rooms_[product_type]->ProductsCount();
+}
+void Storage::StartPurchasePhase(){
+    mode_ = 1;
+    for (int i = 0; i < 15; i++) {
+        if (rooms_[i] != nullptr)
+            rooms_[i]->StartPurchasePhase(GetPurchasePrice(i));
+    }
+}
+void Storage::StopPurchasePhase() {
+    mode_ = 0;
+    for (int i = 0; i < 15; i++) {
+        if (rooms_[i] != nullptr)
+            rooms_[i]->StopPurchasePhase();
+    }
+}
+bool Storage::IsOrderCountsCorrect() {
+    for (int i = 0; i < 15; i++) {
+        if (rooms_[i] != nullptr)
+            if (!rooms_[i]->IsOrderCountCorrect())
+                return false;
+    }
+    return true;
 }

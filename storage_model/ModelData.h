@@ -26,5 +26,7 @@ private:
 int GetProductPrice(int type);
 int GetCountAtBox(int type);
 int GetShelfLife(int type);
+int GetPurchasePrice(int type);
+int GetMaxBoxCount(int type);
 std::wstring GetProductName(int type);
 std::wstring IntToString(int number);

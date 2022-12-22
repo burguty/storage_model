@@ -114,6 +114,9 @@ void InputLine::SetStatus(bool status) {
 void InputLine::SetTextColor(sf::Color color) {
     text_sfml_.setFillColor(color);
 }
+void InputLine::SetText(std::wstring text) {
+    text_ = text;
+}
 
 TextLine::TextLine(int x0, int y0, int len_x, int len_y, std::wstring text,
     sf::Font& font, int letter_size, sf::Color color_outline, 
