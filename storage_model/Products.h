@@ -8,6 +8,7 @@
 class IProduct {
 public:
     IProduct(int product_type, int price);
+    IProduct(int product_type, int price, int days);
     virtual ~IProduct();
     int ProductType();
     int Price();
@@ -19,6 +20,7 @@ protected:
     void ChangePrice(int new_price);
     int product_type_;
     sf::Color back_color_;
+    int object_type_; // 0 - Purchase
 private:
     int price_, remains_;
 };
@@ -34,9 +36,10 @@ public:
 
 class ProductBatch : public IProduct, public IClickable, public IMovable {
 public:
-    ProductBatch(int product_type, int price, int purchase_price,
-        int count_at_box, int box_count, int x0, int y0);
-
+    ProductBatch(int product_type, int price, int purchase_price, 
+        int box_count, int x0, int y0);
+    ProductBatch(int product_type, int price, int purchase_price, 
+        int box_count, int days, int x0, int y0);
     int PurchasePrice();
     void Reduction(int new_cost);
     int ProductsCount();
@@ -67,13 +70,14 @@ public:
     std::vector<ProductBatch*> Clearing();
     int RequestPrice(int products_count);
     std::vector<ProductBatch*> ProductShipments(int box_count);
+    int ProductType();
     int ProductsCount();
     int ProductsPrice();
     int ProductsPurchasePrice();
     int SpentOnPurchase();
     int Profit();
     int BoxCount();
-    void StartPurchasePhase(int purchase_price);
+    void StartPurchasePhase(int purchase_price, int time_of_purchase);
     void StopPurchasePhase();
     void GoToTheNextDay();
     void SetOrderCount(int count);
@@ -85,16 +89,18 @@ public:
     virtual void DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font);
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
-private:
+    int CalculateXForPurchase(int ind = -1);
+    int CalculateYForPurchase(int ind = -1);
     int CalculateXForBatch(int ind = -1);
     int CalculateYForBatch(int ind = -1);
-
+private:
     int mode_ = 0;
-    int order_count_ = 0, purchase_price_;
+    int order_count_ = 0, purchase_price_, time_of_purchase_;
     int max_box_count_;
 
     int product_type_, count_at_box_, profit_ = 0;
     std::deque<ProductBatch*>batches_;
+    std::vector<ProductBatch*>purchases_;
 
     const int width_ = 150, height_ = 90, step_ = 10, in_line_ = 5;
     sf::RectangleShape texture_;
@@ -116,7 +122,7 @@ public:
     void GoToTheNextDay();
     bool IsProductUsing(int product_type);
     int ProductsCount(int product_type);
-    void StartPurchasePhase();
+    void StartPurchasePhase(int time_of_purchase);
     void StopPurchasePhase();
     bool IsOrderCountsCorrect();
 

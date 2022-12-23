@@ -54,6 +54,18 @@ bool InfoField::Click(int x, int y) {
                 ChangeMode(nullptr);
                 return true;
             }
+            if (buttons_[1]->Click(x, y)) {
+                int type = dynamic_cast<StorageRoom*>(object_)->ProductType();
+                if (dynamic_cast<StorageRoom*>(object_)->BoxCount() >= GetMaxBoxCount(type) / 2) {
+                    dynamic_cast<StorageRoom*>(object_)->SetOrderCount(0);
+                    input_lines_[0]->SetText(L"0");
+                } else {
+                    int box_count = GetMaxBoxCount(type) / 2 - dynamic_cast<StorageRoom*>(object_)->BoxCount();
+                    dynamic_cast<StorageRoom*>(object_)->SetOrderCount(box_count);
+                    input_lines_[0]->SetText(IntToString(box_count));
+                }
+                return true;
+            }
             if (input_lines_[0]->Click(x, y)) {
                 return true;
             }
@@ -124,6 +136,8 @@ void InfoField::ChangeMode(IClickable* new_object) {
 
             buttons_.push_back(new Button(x0_, y0_ + height_ + 20 + 40 + 20,
                 120, 40, L"Не заказывать", font_));
+            buttons_.push_back(new Button(x0_, y0_ + height_ + 20 + 40 + 20 + 40 + 20,
+                120, 40, L"Оптимальное значение", font_));
         }
     }
 }

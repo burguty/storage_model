@@ -14,6 +14,8 @@ IProduct::IProduct(int product_type, int price) :
         back_color_ = sf::Color(0, 255, 0, 120);
     }
 }
+IProduct::IProduct(int product_type, int price, int days) :
+    product_type_(product_type), price_(price), remains_(days) {}
 IProduct::~IProduct() {}
 int IProduct::Price() {
     return price_;
@@ -47,13 +49,21 @@ void IProduct::SetColor(sf::Color color) {
 }
 
 // ProductBatch
-ProductBatch::ProductBatch(int product_type, int price, int purchase_price,
-    int count_at_box, int box_count, int x0, int y0) :
+ProductBatch::ProductBatch(int product_type, int price, int purchase_price, int box_count, int x0, int y0) :
     IProduct(product_type, price), IDrawable(x0, y0),
-    count_at_box_(count_at_box), box_count_(box_count), purchase_price_(purchase_price) {
+    count_at_box_(GetCountAtBox(product_type)), box_count_(box_count), purchase_price_(purchase_price) {
     texture_.setOutlineThickness(3);
     texture_.setOutlineColor(sf::Color(0, 0, 0, 150));
     texture_.setSize(sf::Vector2f(width, height));
+    object_type_ = 1;
+}
+ProductBatch::ProductBatch(int product_type, int price, int purchase_price, int box_count, int days, int x0, int y0) :
+    IProduct(product_type, price, days), IDrawable(x0, y0),
+    count_at_box_(GetCountAtBox(product_type)), box_count_(box_count), purchase_price_(purchase_price) {
+    texture_.setOutlineThickness(3);
+    texture_.setOutlineColor(sf::Color(0, 0, 0, 150));
+    texture_.setSize(sf::Vector2f(width, height));
+    object_type_ = 0;
 }
 void ProductBatch::Reduction(int new_cost) {
     ChangePrice(new_cost);
@@ -83,7 +93,7 @@ int ProductBatch::PurchasePrice() {
     return purchase_price_;
 }
 int ProductBatch::GetVisualizationType() {
-    return 1;
+    return object_type_;
 }
 IClickable* ProductBatch::Click(int x, int y) {
     if (x0_ <= x && x <= x0_ + width && y0_ <= y && y <= y0_ + height)
@@ -91,21 +101,40 @@ IClickable* ProductBatch::Click(int x, int y) {
     return nullptr;
 }
 void ProductBatch::draw(sf::RenderWindow& window) {
-    texture_.setPosition(x0_, y0_);
-    texture_.setFillColor(back_color_);
+    if (object_type_ == 1) {
+        texture_.setPosition(x0_, y0_);
+        texture_.setFillColor(back_color_);
+        
+    } else {
+        texture_.setPosition(x0_, y0_);
+        texture_.setFillColor(sf::Color(30, 30, 30, 120));
+
+    }
     window.draw(texture_);
 }
 void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
-    sf::Text information(L"Партия товара \"" + GetProductName(product_type_) + L"\"" +
-        L"\nКоличество в партии - " + IntToString(count_at_box_ * box_count_) + L" шт." +
-        L"\nСрок годности - " + IntToString(Remains()) + L" дней" +
-        L"\nЦена за шт. - " + IntToString(Price()) + L" руб." +
-        L"\nЗакупочная цена за шт. - " + IntToString(purchase_price_) + L" руб." +
-        L"\nСтоимость партии - " + IntToString(Price() * count_at_box_ * box_count_) + L" руб.",
-        font, 24);
-    information.setPosition(x0 + 5, y0 + 5);
-    information.setFillColor(sf::Color::Black);
-    window.draw(information);
+    if (object_type_ == 1) {
+        sf::Text information(L"Партия товара \"" + GetProductName(product_type_) + L"\"" +
+            L"\nКоличество в оптовых упаковок - " + IntToString(box_count_) + L" шт." +
+            L"\nСрок годности - " + IntToString(Remains()) + L" дней" +
+            L"\nЦена - " + IntToString(Price()) + L" руб/шт" +
+            L"\nЗакупочная цена - " + IntToString(purchase_price_) + L" руб/шт" +
+            L"\nСтоимость партии - " + IntToString(Price() * count_at_box_ * box_count_) + L" руб.",
+            font, 24);
+        information.setPosition(x0 + 5, y0 + 5);
+        information.setFillColor(sf::Color::Black);
+        window.draw(information);
+    } else {
+        sf::Text information(L"Поставка товара \"" + GetProductName(product_type_) + L"\"" +
+            L"\nКоличество в партии - " + IntToString(box_count_) + L" шт." +
+            L"\n Дней до доставки - " + IntToString(Remains()) +
+            L"\nЗакупочная цена - " + IntToString(purchase_price_) + L" руб/шт" +
+            L"\nСтоимость партии - " + IntToString(Price() * count_at_box_ * box_count_) + L" руб.",
+            font, 24);
+        information.setPosition(x0 + 5, y0 + 5);
+        information.setFillColor(sf::Color::Black);
+        window.draw(information);
+    }
 }
 void ProductBatch::Move(int x, int y) {
     x0_ = x, y0_ = y;
@@ -148,9 +177,8 @@ std::vector<ProductBatch*> StorageRoom::ProductShipments(int box_count) {
             result.push_back(batches_[0]);
             batches_.pop_front();
         } else {
-            result.push_back(new ProductBatch(product_type_,
-                batches_[0]->Price(), batches_[0]->PurchasePrice(),
-                GetCountAtBox(product_type_), 
+            result.push_back(new ProductBatch(product_type_, batches_[0]->Price(),
+                batches_[0]->PurchasePrice(),
                 count / GetCountAtBox(product_type_), x0_, y0_));
         }
         products_count -= count;
@@ -184,6 +212,17 @@ int StorageRoom::CalculateXForBatch(int ind) {
 int StorageRoom::CalculateYForBatch(int ind) {
     return y0_ + step_ + (15 + step_) * 
         ((ind == -1 ? batches_.size() : ind) / in_line_);
+}
+int StorageRoom::CalculateXForPurchase(int ind) {
+    return x0_ + step_ + (15 + step_) *
+        ((ind == -1 ? purchases_.size() : ind) % in_line_);
+}
+int StorageRoom::CalculateYForPurchase(int ind) {
+    return y0_ + 90 - step_ - 15 + (15 + step_) *
+        ((ind == -1 ? purchases_.size() : ind) / in_line_);
+}
+int StorageRoom::ProductType() {
+    return product_type_;
 }
 int StorageRoom::ProductsCount() {
     int result = 0;
@@ -219,19 +258,24 @@ int StorageRoom::Profit() {
 int StorageRoom::BoxCount() {
     int result = 0;
     for (ProductBatch* batch : batches_)
-        result += batch->ProductsCount();
+        result += batch->BoxCount();
     return result;
 }
 void StorageRoom::GoToTheNextDay() {
     for (ProductBatch* batch : batches_)
         batch->GoToTheNextDay();
 }
-void StorageRoom::StartPurchasePhase(int purchase_price) {
+void StorageRoom::StartPurchasePhase(int purchase_price, int time_of_purchase) {
     mode_ = 1;
     order_count_ = 0;
     purchase_price_ = purchase_price;
+    time_of_purchase_ = time_of_purchase;
 }
 void StorageRoom::StopPurchasePhase() {
+    if (order_count_ > 0) {
+        purchases_.push_back(new ProductBatch(product_type_, -1, purchase_price_, 
+            order_count_, time_of_purchase_, CalculateXForPurchase(), CalculateYForPurchase()));
+    }
     mode_ = 0;
 }
 bool StorageRoom::IsOrderCountCorrect() {
@@ -271,6 +315,8 @@ void StorageRoom::draw(sf::RenderWindow& window) {
     if (mode_ == 0) {
         for (auto product_batch : batches_)
             product_batch->draw(window);
+        for (auto purchase : purchases_)
+            purchase->draw(window);
     } else {
         sf::Text box_count(L"Заказано " + IntToString(order_count_), *back_text_.getFont(), 26);
         box_count.setStyle(sf::Text::Bold);
@@ -302,6 +348,7 @@ void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::
             information.setCharacterSize(24);
         } else {
             information.setString(GetProductName(product_type_) +
+                L"\nОптовых упаковок на складе - " + IntToString(box_count_in_room) + L" шт." + 
                 L"\nДоступно для заказа - " + IntToString(max_box_count_ - box_count_in_room) + L" шт." +
                 L"\nЗаполнено с учетом заказа на " + IntToString((box_count_in_room + order_count_) * 100 / max_box_count_) + L"%" +
                 L"\nСтоимость заказа - " + IntToString(order_count_ * count_at_box_ * purchase_price_) + L" руб."
@@ -326,8 +373,9 @@ Storage::Storage(ModelData* data, int x0, int y0, sf::Font& font) :
                 y0_ + step_ + (step_ + 90) * (nomb / in_line_), font);
             if (data->GetCountProduct(product_type) != 0) {
                 rooms_[product_type]->AddDelivery(new ProductBatch(product_type,
-                    GetProductPrice(product_type), GetProductPrice(product_type) / 2,
-                    GetCountAtBox(product_type), data->GetCountProduct(product_type),
+                    GetProductPrice(product_type),
+                    GetProductPrice(product_type) / 2,
+                    data->GetCountProduct(product_type),
                     0, 0));
             }
             nomb++;
@@ -429,11 +477,11 @@ bool Storage::IsProductUsing(int product_type) {
 int Storage::ProductsCount(int product_type) {
     return rooms_[product_type]->ProductsCount();
 }
-void Storage::StartPurchasePhase(){
+void Storage::StartPurchasePhase(int time_of_purchase) {
     mode_ = 1;
     for (int i = 0; i < 15; i++) {
         if (rooms_[i] != nullptr)
-            rooms_[i]->StartPurchasePhase(GetPurchasePrice(i));
+            rooms_[i]->StartPurchasePhase(GetPurchasePrice(i), time_of_purchase);
     }
 }
 void Storage::StopPurchasePhase() {

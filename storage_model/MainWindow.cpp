@@ -112,7 +112,7 @@ bool MainWindow::MainLoop(ModelData* data) {
         if (condition == 3) {
             if (requests.empty()) {
                 condition = 4;
-                storage->StartPurchasePhase();
+                storage->StartPurchasePhase(gen() % 5 + 1);
             }
         }
         // заказ новых товаров
