@@ -4,19 +4,16 @@
 IProduct::IProduct(int product_type, int price) :
     product_type_(product_type), price_(price) {
     remains_ = GetShelfLife(product_type);
-    if (remains_ <= 2) {
-        if (remains_ <= 0) {
-            back_color_ = sf::Color(0, 0, 0, 120);
-        } else {
-            back_color_ = sf::Color(255, 0, 0, 120);
-        }
-    } else {
-        back_color_ = sf::Color(0, 255, 0, 120);
-    }
+    CalculateColor();
 }
 IProduct::IProduct(int product_type, int price, int days) :
     product_type_(product_type), price_(price), remains_(days) {}
 IProduct::~IProduct() {}
+void IProduct::SetRemains() {
+    remains_ = GetShelfLife(product_type_);
+    object_type_ = 1;
+    CalculateColor();
+}
 int IProduct::Price() {
     return price_;
 }
@@ -34,6 +31,12 @@ bool IProduct::IsOverdue() {
 }
 void IProduct::GoToTheNextDay() {
     remains_--;
+    CalculateColor();
+}
+void IProduct::SetColor(sf::Color color) {
+    back_color_ = color;
+}
+void IProduct::CalculateColor() {
     if (remains_ <= 2) {
         if (remains_ <= 0) {
             back_color_ = sf::Color(0, 0, 0, 120);
@@ -43,9 +46,6 @@ void IProduct::GoToTheNextDay() {
     } else {
         back_color_ = sf::Color(0, 255, 0, 120);
     }
-}
-void IProduct::SetColor(sf::Color color) {
-    back_color_ = color;
 }
 
 // ProductBatch
@@ -273,7 +273,7 @@ void StorageRoom::StartPurchasePhase(int purchase_price, int time_of_purchase) {
 }
 void StorageRoom::StopPurchasePhase() {
     if (order_count_ > 0) {
-        purchases_.push_back(new ProductBatch(product_type_, -1, purchase_price_, 
+        purchases_.push_back(new ProductBatch(product_type_, GetProductPrice(product_type_), purchase_price_, 
             order_count_, time_of_purchase_, CalculateXForPurchase(), CalculateYForPurchase()));
     }
     mode_ = 0;
@@ -289,6 +289,26 @@ int StorageRoom::GetOrderCount() {
 }
 void StorageRoom::SetOrderCount(int count) {
     order_count_ = count;
+}
+std::deque<IMovable*> StorageRoom::GoToTheNextDayCars(){
+    auto it = purchases_.begin();
+    std::deque<IMovable*> result;
+    while(it != purchases_.end()){
+        (*it)->GoToTheNextDay();
+        if ((*it)->IsOverdue()) {
+            (*it)->StartMoving(CalculateXForBatch(), CalculateYForBatch(), 1);
+            batches_.push_back(*it);
+            batches_.back()->SetRemains();
+            result.push_back(static_cast<IMovable*>(batches_.back()));
+            it = purchases_.erase(it);
+        } else {
+            it++;
+        }
+    }
+    for (int i = 0; i < purchases_.size(); i++) {
+        purchases_[i]->Move(CalculateXForPurchase(i), CalculateYForPurchase(i));
+    }
+    return result;
 }
 
 int StorageRoom::GetVisualizationType() {
@@ -498,4 +518,14 @@ bool Storage::IsOrderCountsCorrect() {
                 return false;
     }
     return true;
+}
+std::deque<IMovable*> Storage::GoToTheNextDayCars() {
+    std::deque<IMovable*> result;
+    for (int i = 0; i < 17; i++) {
+        if (rooms_[i] != nullptr) {
+            std::deque<IMovable*> result_i = rooms_[i]->GoToTheNextDayCars();
+            result.insert(result.end(), result_i.begin(), result_i.end());
+        }
+    }
+    return result;
 }

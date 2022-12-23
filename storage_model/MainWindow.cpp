@@ -44,12 +44,15 @@ bool MainWindow::MainLoop(ModelData* data) {
                     ClearMemory();
                     return false;
                 }
-                if (info_field->Click(x, y)) {
-                    if (condition == 3) {
+                if (condition == 3) {
+                    if (info_field->Click(x, y)) {
                         deliveries.push_back(requests.back());
                         requests.pop_back();
                         info_field->ChangeMode(GetNextRequest());
                     }
+                    continue;
+                }
+                if (info_field->Click(x, y)) {
                     continue;
                 }
                 if (condition == 4) {
@@ -98,11 +101,19 @@ bool MainWindow::MainLoop(ModelData* data) {
                 }
             } else {
                 condition = 1;
+                on_the_move = storage->GoToTheNextDayCars();
             }
         }
         // анимация завоза
         if (condition == 1) {
-            condition = 2;
+            for (int i = 0; i < on_the_move.size(); i++) {
+                if (on_the_move[i]->Move(time) && i == 0) {
+                    i--;
+                    on_the_move.pop_front();
+                }
+            }
+            if (on_the_move.empty())
+                condition = 2;
         }
         // ожидание заказов и изменение цены
         if (condition == 2) {

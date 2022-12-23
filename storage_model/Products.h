@@ -15,6 +15,8 @@ public:
     void GoToTheNextDay();
     bool IsOverdue();
     void SetColor(sf::Color color);
+    void CalculateColor();
+    void SetRemains();
 protected:
     int Remains();
     void ChangePrice(int new_price);
@@ -79,6 +81,7 @@ public:
     int BoxCount();
     void StartPurchasePhase(int purchase_price, int time_of_purchase);
     void StopPurchasePhase();
+    std::deque<IMovable*> GoToTheNextDayCars();
     void GoToTheNextDay();
     void SetOrderCount(int count);
     bool IsOrderCountCorrect();
@@ -120,6 +123,7 @@ public:
     int Profit();
     int Price();
     void GoToTheNextDay();
+    std::deque<IMovable*> GoToTheNextDayCars();
     bool IsProductUsing(int product_type);
     int ProductsCount(int product_type);
     void StartPurchasePhase(int time_of_purchase);

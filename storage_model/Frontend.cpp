@@ -147,7 +147,7 @@ void TextLine::SetText(std::wstring text) {
 IMovable::IMovable() {}
 void IMovable::StartMoving(int target_x, int target_y, int time) {
     target_x_ = target_x;
-    target_y_ = target_y_;
+    target_y_ = target_y;
     x_start_ = x0_;
     y_start_ = y0_;
     time_ = time;
