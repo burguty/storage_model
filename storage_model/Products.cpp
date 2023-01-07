@@ -166,6 +166,7 @@ StorageRoom::~StorageRoom() {
 }
 void StorageRoom::AddDelivery(ProductBatch* batch) {
     batch->Move(CalculateXForBatch(), CalculateYForBatch());
+    expenses_ += batch->PurchasePrice() * batch->ProductsCount();
     batches_.push_back(batch);
 }
 std::vector<ProductBatch*> StorageRoom::ProductShipments(int box_count) {
@@ -181,6 +182,7 @@ std::vector<ProductBatch*> StorageRoom::ProductShipments(int box_count) {
                 batches_[0]->PurchasePrice(),
                 count / GetCountAtBox(product_type_), x0_, y0_));
         }
+        income_ += result.back()->Price() * count;
         products_count -= count;
     }
     for (int i = 0; i < batches_.size(); i++) {
@@ -191,7 +193,6 @@ std::vector<ProductBatch*> StorageRoom::ProductShipments(int box_count) {
 std::vector<ProductBatch*> StorageRoom::Clearing() {
     std::vector<ProductBatch*> trash;
     while (!batches_.empty() && batches_[0]->IsOverdue()) {
-        profit_ -= batches_[0]->PurchasePrice() * batches_[0]->ProductsCount();
         trash.push_back(batches_[0]);
         batches_.pop_back();
     }
@@ -253,7 +254,10 @@ int StorageRoom::SpentOnPurchase() {
     return result;
 }
 int StorageRoom::Profit() {
-    return profit_;
+    return income_ - expenses_;
+}
+int StorageRoom::Income() {
+    return income_;
 }
 int StorageRoom::BoxCount() {
     int result = 0;
@@ -353,8 +357,8 @@ void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::
             L"\nКоличество партий - " + IntToString(batches_.size()) + L" шт." +
             L"\nКоличество товаров - " + IntToString(ProductsCount()) + L" шт." +
             L"\nОбщая цена товаров - " + IntToString(ProductsPrice()) + L" руб." +
-            L"\nПрибыль от проданных товаров - " + IntToString(profit_) + L" руб." +
-            L"\nЧистая прибыль - " + IntToString(profit_ - SpentOnPurchase()) + L" руб."
+            L"\nПрибыль от проданных товаров - " + IntToString(income_) + L" руб." +
+            L"\nЧистая прибыль - " + IntToString(income_ - expenses_) + L" руб."
             );
         information.setCharacterSize(24);
         information.setFillColor(sf::Color::Black);
@@ -441,6 +445,13 @@ int Storage::Profit() {
             profit += rooms_[i]->Profit();
     return profit;
 }
+int Storage::Income() {
+    int income = 0;
+    for (int i = 0; i < 17; i++)
+        if (rooms_[i] != nullptr)
+            income += rooms_[i]->Income();
+    return income;
+}
 int Storage::Price() {
     int price = 0;
     for (int i = 0; i < 17; i++)
@@ -460,7 +471,6 @@ void Storage::GoToTheNextDay() {
         if (rooms_[i] != nullptr)
             rooms_[i]->GoToTheNextDay();
 }
-
 void Storage::draw(sf::RenderWindow& window) {
     window.draw(texture_);
     for (int i = 0; i < 17; i++)
@@ -484,8 +494,8 @@ IClickable* Storage::Click(int x, int y) {
 }
 void Storage::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
     sf::Text information(L"Склад\nОбщая цена товаров - " + IntToString(Price()) + L" руб." +
-        L"\nПрибыль от проданных товаров - " + IntToString(Profit()) + L" руб." +
-        L"\nЧистая прибыль - " + IntToString(Profit() - SpentOnPurchase()) + L" руб.",
+        L"\nПрибыль от проданных товаров - " + IntToString(Income()) + L" руб." +
+        L"\nЧистая прибыль - " + IntToString(Profit()) + L" руб.",
         font, 24);
     information.setPosition(x0 + 5, y0 + 5);
     information.setFillColor(sf::Color::Black);

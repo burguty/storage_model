@@ -24,5 +24,5 @@ private:
     std::vector<Request*>requests;
     std::vector<Request*>deliveries;
     std::deque<IMovable*>on_the_move;
-    int condition = 0;
+    int condition = 0, time_of_purchase = -1;
 };

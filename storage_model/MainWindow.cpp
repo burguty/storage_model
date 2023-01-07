@@ -18,9 +18,9 @@ bool MainWindow::MainLoop(ModelData* data) {
         780 - 5 - 350 - 10,
         font_storage_room);
     info_field = new InfoField(storage, 1170, 30, font_text);
-    button_stop = new Button(1170, 784, 250, 50, L"Остановить модель", font_text);
-    button_order = new Button(30, 800, 220, 50, L"Заказать", font_text);
-    button_create_requests = new Button(30, 800, 220, 50, L"Принять заказы", font_text, 25);
+    button_stop = new Button(30, 800, 250, 50, L"Остановить модель", font_text);
+    button_order = new Button(30 + 250 + 15, 800, 220, 50, L"Заказать", font_text);
+    button_create_requests = new Button(30 + 250 + 15, 800, 220, 50, L"Принять заказы", font_text, 25);
     int day = 0;
     condition = 0;
 
@@ -81,7 +81,7 @@ bool MainWindow::MainLoop(ModelData* data) {
             if (event.type == sf::Event::TextEntered) {
                 if (event.text.unicode == 8) {
                     info_field->TypeSymbol();
-                } else {
+                } else if (event.text.unicode >= '0' && event.text.unicode <= '9') {
                     info_field->TypeSymbol(event.text.unicode);
                 }
             }
@@ -123,7 +123,8 @@ bool MainWindow::MainLoop(ModelData* data) {
         if (condition == 3) {
             if (requests.empty()) {
                 condition = 4;
-                storage->StartPurchasePhase(gen() % 5 + 1);
+                time_of_purchase = gen() % 5 + 1;
+                storage->StartPurchasePhase(time_of_purchase);
             }
         }
         // заказ новых товаров
@@ -145,8 +146,7 @@ bool MainWindow::MainLoop(ModelData* data) {
                     if ((*it)->Move(time)) {
                         delete (*it);
                         it = on_the_move.erase(it);
-                    }
-                    else
+                    } else
                         ++it;
                 }
             } else {

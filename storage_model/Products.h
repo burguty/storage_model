@@ -74,6 +74,7 @@ public:
     std::vector<ProductBatch*> ProductShipments(int box_count);
     int ProductType();
     int ProductsCount();
+    int Income();
     int ProductsPrice();
     int ProductsPurchasePrice();
     int SpentOnPurchase();
@@ -101,7 +102,7 @@ private:
     int order_count_ = 0, purchase_price_, time_of_purchase_;
     int max_box_count_;
 
-    int product_type_, count_at_box_, profit_ = 0;
+    int product_type_, count_at_box_, income_ = 0, expenses_ = 0;
     std::deque<ProductBatch*>batches_;
     std::vector<ProductBatch*>purchases_;
 
@@ -122,6 +123,7 @@ public:
     int SpentOnPurchase();
     int Profit();
     int Price();
+    int Income();
     void GoToTheNextDay();
     std::deque<IMovable*> GoToTheNextDayCars();
     bool IsProductUsing(int product_type);
