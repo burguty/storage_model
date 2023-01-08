@@ -17,13 +17,19 @@ bool MainWindow::MainLoop(ModelData* data) {
         30 + (1150 - 30) / 2 - 425,
         780 - 5 - 350 - 10,
         font_storage_room);
-    info_field = new InfoField(storage, 1170, 30, font_text);
-    button_stop = new Button(30, 800, 250, 50, L"Остановить модель", font_text);
-    button_order = new Button(30 + 250 + 15, 800, 220, 50, L"Заказать", font_text);
-    button_create_requests = new Button(30 + 250 + 15, 800, 220, 50, L"Принять заказы", font_text, 25);
     int day = 0;
     condition = 0;
-
+    info_field = new InfoField(storage, 1170, 30 + 30 + 15, font_text);
+    button_stop = new Button(30, 800, 250, 50, 
+        L"Остановить модель", font_text, 25);
+    button_order = new Button(30 + 250 + 15, 800, 220, 50, 
+        L"Заказать", font_text, 25);
+    button_create_requests = new Button(30 + 250 + 15, 800, 220, 50, 
+        L"Принять заказы", font_text, 25);
+    text_time_of_purchase = new TextLine(30+250+15 + 220 + 15, 800, 100, 50,
+        L"", font_text, 25);
+    text_day = new TextLine(1170 - 10, 20, 100, 30,
+        L"День номер " + IntToString(day + 1), font_text, 30);
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event))
@@ -112,8 +118,13 @@ bool MainWindow::MainLoop(ModelData* data) {
                     on_the_move.pop_front();
                 }
             }
-            if (on_the_move.empty())
-                condition = 2;
+            if (on_the_move.empty()) {
+                if (day == data->GetNumberDays()) {
+                    condition = -1;
+                } else {
+                    condition = 2;
+                }
+            }
         }
         // ожидание заказов и изменение цены
         if (condition == 2) {
@@ -125,15 +136,20 @@ bool MainWindow::MainLoop(ModelData* data) {
                 condition = 4;
                 time_of_purchase = gen() % 5 + 1;
                 storage->StartPurchasePhase(time_of_purchase);
+                text_time_of_purchase->SetText(L"Доставка через " +
+                    IntToString(time_of_purchase) +
+                    (time_of_purchase == 1 ? L" день" : (time_of_purchase == 5 ? L" дней" : L" дня")));
             }
         }
         // заказ новых товаров
         if (condition == 4) {
+            text_time_of_purchase->draw(window);
             button_order->draw(window);
         }
         // +1 день и вывоз просрочки
         if (condition == 5) {
             day += 1;
+            text_day->SetText(L"День номер " + IntToString(day + 1));
             storage->GoToTheNextDay();
             ClearStorage();
             condition = 6;
@@ -157,6 +173,7 @@ bool MainWindow::MainLoop(ModelData* data) {
         DrawInterface(window);
         storage->draw(window);
         info_field->draw(window);
+        text_day->draw(window);
         button_stop->draw(window);
         DrawMovableObject(window);
         for (int i = 0; i < shops.size(); i++) {
@@ -217,7 +234,15 @@ void MainWindow::ClearMemory() {
     delete info_field;
     delete button_stop;
     delete button_create_requests;
-    for (IMovable* movable : on_the_move) {
+    delete button_order;
+    delete text_day;
+    delete text_time_of_purchase;
+    for (IMovable* movable : on_the_move)
         delete movable;
-    }
+    for (Shop* shop : shops)
+        delete shop;
+    for (Request* request : requests)
+        delete request;
+    for (Request* delivery : deliveries)
+        delete delivery;
 }

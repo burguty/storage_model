@@ -20,6 +20,8 @@ private:
     Button* button_stop;
     Button* button_create_requests;
     Button* button_order;
+    TextLine* text_time_of_purchase;
+    TextLine* text_day;
     std::vector<Shop*>shops;
     std::vector<Request*>requests;
     std::vector<Request*>deliveries;
