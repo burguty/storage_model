@@ -42,7 +42,7 @@ int SHELF_LIFE[15] = {3, 2, 5, 4, 5, 3, 4, 5, 3, 2, 3, 2, 2, 4, 7};
 int MAX_BOX_COUNT[15] = {30, 30, 15, 15, 10, 10, 15, 20, 20, 10, 15, 10, 20, 10, 15};
 int PRODUCT_PRICE[15] = {20, 30, 50, 60, 10, 100, 200, 150, 300, 250, 140, 420, 260, 780, 960};
 int COUNT_AT_BOX[15] = {20, 20, 10, 30, 20, 30, 10, 10, 20, 20, 10, 10, 20, 30, 20};
-int PURCHASE_PRICE[15] = {5, 5, 15};
+int PURCHASE_PRICE[15] = {5, 5, 15, 15, 20, 10, 30, 25, 25, 30, 50, 30, 10, 40, 50};
 
 std::wstring GetProductName(int type) {
     return PRODUCT_NAME[type];
