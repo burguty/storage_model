@@ -48,7 +48,8 @@ public:
     int CalculateRequiredBox(int products_count);
     int CalculateSellingProducts(int products_count);
     int RequestPrice(int products_count);
-    bool Sell(int products_count);
+    void Sell(int products_count);
+    bool IsItPossibleToSell(int products_count);
     int BoxCount();
 
     void Move(int x, int y);

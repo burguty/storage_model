@@ -39,9 +39,6 @@ bool MainWindow::MainLoop(ModelData* data) {
                 ClearMemory();
                 return true;
             }
-            if (condition == -1) {
-                continue;
-            }
             if (event.type == sf::Event::MouseButtonPressed
                 && event.mouseButton.button == sf::Mouse::Left) {
                 int x = event.mouseButton.x, y = event.mouseButton.y;
@@ -81,6 +78,17 @@ bool MainWindow::MainLoop(ModelData* data) {
                         info_field->ChangeMode(GetNextRequest());
                         continue;
                     }
+                    bool click = false;
+                    for (int i = 0; i < shops.size(); i++) {
+                        IClickable* result = shops[i]->Click(x, y);
+                        if (result != nullptr) {
+                            click = true;
+                            info_field->ChangeMode(result);
+                            break;
+                        }
+                    }
+                    if (click)
+                        continue;
                 }
                 info_field->ChangeMode(storage->Click(x, y));
             }
@@ -121,6 +129,8 @@ bool MainWindow::MainLoop(ModelData* data) {
             if (on_the_move.empty()) {
                 if (day == data->GetNumberDays()) {
                     condition = -1;
+                    text_day->SetColor(sf::Color::Red);
+                    text_day->SetText(L"Моделирование заверешено");
                 } else {
                     condition = 2;
                 }
@@ -197,6 +207,7 @@ void MainWindow::SendProducts() {
         for (ProductBatch* batch : storage->ProductShipments(product_type, delivery->approved_count_)) {
             batch->SetColor(sf::Color(0, 191, 255, 120));
             batch->StartMoving(delivery->GetTargetX(), delivery->GetTargetY(), 2);
+            delivery->AddProductBatch(batch);
             on_the_move.push_back(static_cast<IMovable*>(batch));
         }
     }

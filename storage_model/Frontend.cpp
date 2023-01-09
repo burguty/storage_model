@@ -143,6 +143,9 @@ bool TextLine::Click(int x, int y) {
 void TextLine::SetText(std::wstring text) {
     text_sfml_.setString(text);
 }
+void TextLine::SetColor(sf::Color color) {
+    text_sfml_.setFillColor(color);
+}
 
 IMovable::IMovable() {}
 void IMovable::StartMoving(int target_x, int target_y, int time) {

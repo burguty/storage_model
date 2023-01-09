@@ -51,6 +51,9 @@ int Request::GetTargetX() {
 int Request::GetTargetY() {
     return customer_->GetY0();
 }
+void Request::AddProductBatch(ProductBatch* batch) {
+    customer_->AddProductBatch(batch);
+}
 
 Shop::Shop(int index, sf::Font& font, std::mt19937& gen) :
     IClickable(), IDrawable(CalculateX0(index), CalculateY0(index)), gen_(gen) {
@@ -71,10 +74,12 @@ void Shop::draw(sf::RenderWindow& window) {
 }
 void Shop::DrawInformation(sf::RenderWindow& window,
     int x0, int y0, sf::Font& font) {
-    sf::CircleShape circle(10, 50);
-    circle.setFillColor(sf::Color::Blue);
-    circle.setPosition(x0, y0);
-    window.draw(circle);
+    sf::Text text(L"Магазин \"" + shop_name_ + L"\"" + 
+        L"\nТоваров куплено на " + IntToString(requests_sum_) + L" руб.",
+        font, 24);
+    text.setPosition(x0 + 5, y0 + 5);
+    text.setFillColor(sf::Color::Black);
+    window.draw(text);
 }
 int Shop::GetVisualizationType() {
     return 0;
@@ -144,4 +149,7 @@ int Shop::GetX0() {
 }
 int Shop::GetY0() {
     return y0_;
+}
+void Shop::AddProductBatch(ProductBatch* batch) {
+    requests_sum_ += batch->Price() * batch->ProductsCount();
 }

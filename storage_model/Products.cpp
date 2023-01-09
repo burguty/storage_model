@@ -78,10 +78,13 @@ int ProductBatch::RequestPrice(int products_count) {
 int ProductBatch::CalculateSellingProducts(int products_count) {
     return count_at_box_ * CalculateRequiredBox(products_count);
 }
-bool ProductBatch::Sell(int products_count) {
+bool ProductBatch::IsItPossibleToSell(int products_count) {
+    int box_count = CalculateRequiredBox(products_count);
+    return box_count_ == box_count;
+}
+void ProductBatch::Sell(int products_count) {
     int box_count = CalculateRequiredBox(products_count);
     box_count_ -= box_count;
-    return box_count_ == 0;
 }
 int ProductBatch::ProductsCount() {
     return box_count_ * count_at_box_;
@@ -174,13 +177,14 @@ std::vector<ProductBatch*> StorageRoom::ProductShipments(int box_count) {
     std::vector<ProductBatch*>result;
     while (!batches_.empty() && products_count > 0) {
         int count = batches_[0]->CalculateSellingProducts(products_count);
-        if (batches_[0]->Sell(count)) {
+        if (batches_[0]->IsItPossibleToSell(count)) {
             result.push_back(batches_[0]);
             batches_.pop_front();
         } else {
             result.push_back(new ProductBatch(product_type_, batches_[0]->Price(),
                 batches_[0]->PurchasePrice(),
-                count / GetCountAtBox(product_type_), x0_, y0_));
+                count, x0_, y0_));
+            batches_[0]->Sell(count);
         }
         income_ += result.back()->Price() * count;
         products_count -= count;

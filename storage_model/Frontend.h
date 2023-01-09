@@ -80,6 +80,7 @@ public:
     virtual void draw(sf::RenderWindow& window);
     bool Click(int x, int y);
     void SetText(std::wstring text);
+    void SetColor(sf::Color color);
 private:
     int len_x_, len_y_;
     sf::RectangleShape line_;
