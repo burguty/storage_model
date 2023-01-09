@@ -10,5 +10,5 @@ public:
 private:
     int number_days_ = 0;
     int number_shops_ = 0;
-    int count_products_[17];
+    int count_products_[15];
 };

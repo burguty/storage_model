@@ -390,7 +390,7 @@ void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::
 Storage::Storage(ModelData* data, int x0, int y0, sf::Font& font) :
     IDrawable(x0, y0) {
     int nomb = 0;
-    for (int product_type = 0; product_type < 17; product_type++) {
+    for (int product_type = 0; product_type < 15; product_type++) {
         if (data->IsBeingProductUsed(product_type)) {
             rooms_[product_type] = new StorageRoom(product_type,
                 x0 + step_ + (step_ + 150) * (nomb % in_line_),
@@ -414,14 +414,14 @@ Storage::Storage(ModelData* data, int x0, int y0, sf::Font& font) :
     texture_.setOutlineColor(sf::Color::Black);
 }
 Storage::~Storage() {
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 15; i++) {
         delete rooms_[i];
     }
 }
 
 std::vector<ProductBatch*> Storage::Clearing() {
     std::vector<ProductBatch*> trash;
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 15; i++) {
         if (rooms_[i] != nullptr) {
             std::vector<ProductBatch*> trash_i = rooms_[i]->Clearing();
             trash.insert(trash.end(), trash_i.begin(), trash_i.end());
@@ -440,40 +440,40 @@ std::vector<ProductBatch*> Storage::ProductShipments(int product_type, int box_c
 }
 int Storage::Profit() {
     int profit = 0;
-    for (int i = 0; i < 17; i++)
+    for (int i = 0; i < 15; i++)
         if (rooms_[i] != nullptr)
             profit += rooms_[i]->Profit();
     return profit;
 }
 int Storage::Income() {
     int income = 0;
-    for (int i = 0; i < 17; i++)
+    for (int i = 0; i < 15; i++)
         if (rooms_[i] != nullptr)
             income += rooms_[i]->Income();
     return income;
 }
 int Storage::Price() {
     int price = 0;
-    for (int i = 0; i < 17; i++)
+    for (int i = 0; i < 15; i++)
         if (rooms_[i] != nullptr)
             price += rooms_[i]->ProductsPrice();
     return price;
 }
 int Storage::SpentOnPurchase() {
     int purchase = 0;
-    for (int i = 0; i < 17; i++)
+    for (int i = 0; i < 15; i++)
         if (rooms_[i] != nullptr)
             purchase += rooms_[i]->SpentOnPurchase();
     return purchase;
 }
 void Storage::GoToTheNextDay() {
-    for (int i = 0; i < 17; i++)
+    for (int i = 0; i < 15; i++)
         if (rooms_[i] != nullptr)
             rooms_[i]->GoToTheNextDay();
 }
 void Storage::draw(sf::RenderWindow& window) {
     window.draw(texture_);
-    for (int i = 0; i < 17; i++)
+    for (int i = 0; i < 15; i++)
         if (rooms_[i] != nullptr)
             rooms_[i]->draw(window);
 }
@@ -481,7 +481,7 @@ int Storage::GetVisualizationType() {
     return 0;
 }
 IClickable* Storage::Click(int x, int y) {
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 15; i++) {
         if (rooms_[i] == nullptr)
             continue;
         IClickable* result = rooms_[i]->Click(x, y);
@@ -531,7 +531,7 @@ bool Storage::IsOrderCountsCorrect() {
 }
 std::deque<IMovable*> Storage::GoToTheNextDayCars() {
     std::deque<IMovable*> result;
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 15; i++) {
         if (rooms_[i] != nullptr) {
             std::deque<IMovable*> result_i = rooms_[i]->GoToTheNextDayCars();
             result.insert(result.end(), result_i.begin(), result_i.end());

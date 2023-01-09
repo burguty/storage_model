@@ -54,7 +54,7 @@ public:
     void SetText(std::wstring text);
 private:
     int len_x_, len_y_;
-    std::wstring text_ = L"1";
+    std::wstring text_;
     sf::Text text_sfml_;
     sf::RectangleShape line_;
     bool status_ = false;
