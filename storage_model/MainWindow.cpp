@@ -12,7 +12,7 @@ bool MainWindow::MainLoop(ModelData* data) {
     shops[0] = new Shop(0, font_text, gen);
     for (int i = 1; i < data->GetNumberShops(); i++) {
         shops[i] = new Shop((i % 2 == 0 ? -1 : 1) * (i + 1) / 2, font_text, gen);
-    }
+    } 
     storage = new Storage(data,
         30 + (1150 - 30) / 2 - 425,
         780 - 5 - 350 - 10,
