@@ -18,7 +18,7 @@ bool MainWindow::MainLoop(ModelData* data) {
         780 - 5 - 350 - 10,
         font_storage_room);
     int day = 0;
-    condition = 0;
+    condition = 1;
     info_field = new InfoField(storage, 1170, 30 + 30 + 15, font_text);
     button_stop = new Button(30, 800, 250, 50, 
         L"Остановить модель", font_text, 25);
@@ -47,11 +47,15 @@ bool MainWindow::MainLoop(ModelData* data) {
                     ClearMemory();
                     return false;
                 }
+                if(condition == 7)
+                    continue;
                 if (condition == 3) {
                     if (info_field->Click(x, y)) {
                         deliveries.push_back(requests.back());
                         requests.pop_back();
+                        SendProducts();
                         info_field->ChangeMode(GetNextRequest());
+                        condition = 7;
                     }
                     continue;
                 }
@@ -103,7 +107,7 @@ bool MainWindow::MainLoop(ModelData* data) {
         window.clear(sf::Color(230, 230, 230));
         long double time = clock.restart().asSeconds();
         // Анимация развоза товаров
-        if (condition == 0) {
+        if (condition == 7) {
             if (!on_the_move.empty()) {
                 auto it = on_the_move.begin();
                 while (it != on_the_move.end()) {
@@ -114,8 +118,7 @@ bool MainWindow::MainLoop(ModelData* data) {
                         ++it;
                 }
             } else {
-                condition = 1;
-                on_the_move = storage->GoToTheNextDayCars();
+                condition = 3;
             }
         }
         // анимация завоза
@@ -164,7 +167,7 @@ bool MainWindow::MainLoop(ModelData* data) {
             ClearStorage();
             condition = 6;
         }
-        // Анимация удаления
+        // Анимация удаления просрочки
         if (condition == 6) {
             if (!on_the_move.empty()) {
                 auto it = on_the_move.begin();
@@ -176,8 +179,8 @@ bool MainWindow::MainLoop(ModelData* data) {
                         ++it;
                 }
             } else {
-                condition = 0;
-                SendProducts();
+                condition = 1;
+                on_the_move = storage->GoToTheNextDayCars();
             }
         }
         DrawInterface(window);
