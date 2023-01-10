@@ -140,7 +140,7 @@ public:
     virtual IClickable* Click(int x, int y);
 private:
     int mode_ = 0;
-    StorageRoom* rooms_[17];
+    StorageRoom* rooms_[15];
     const int width_ = 1150 - 300, height_ = 350, step_ = 15, in_line_ = 5;
     sf::RectangleShape texture_;
 };

@@ -4,7 +4,7 @@
 ModelData::ModelData(int number_days, int number_shops, 
     CheckBox* check_boxes[], int count_products[]) : 
     number_days_(number_days), number_shops_(number_shops) {
-    for (int i = 0; i < 17; ++i) {
+    for (int i = 0; i < 15; ++i) {
         used_products_[i] = check_boxes[i]->GetStatus();
         number_products_ += used_products_[i];
         count_products_[i] = count_products[i];
@@ -36,14 +36,13 @@ int ModelData::GetCountProduct(int type) {
     return count_products_[type];
 }
 
-std::wstring PRODUCT_NAME[17] = {L"Сахар" , L"Соль", L"Каша", L"Хлопья", L"Макароны", L"Чай",
-L"Шоколад", L"Кофе", L"Какао", L"Масло", L"Рыба", L"Творог", L"Молоко", L"Сыр",
-L"Вино", L"Курица", L"Говядина"};
-int SHELF_LIFE[17] = {3, 2, 5};
-int MAX_BOX_COUNT[15] = {15, 15, 15};
-int PRODUCT_PRICE[17] = {20, 30, 50, 60, 10, 100, 200, 150, 300, 250, 140, 420, 260, 780, 960, 150, 120};
-int COUNT_AT_BOX[17] = {20, 20, 10};
-int PURCHASE_PRICE[15] = {5, 5, 15};
+std::wstring PRODUCT_NAME[15] = {L"Сахар" , L"Соль", L"Каша", L"Хлопья", L"Макароны", L"Чай",
+L"Шоколад", L"Кофе", L"Какао", L"Масло", L"Рыба", L"Творог", L"Молоко", L"Сыр", L"Вино"};
+int SHELF_LIFE[15] = {3, 2, 5, 4, 5, 3, 4, 5, 3, 2, 3, 2, 2, 4, 7};
+int MAX_BOX_COUNT[15] = {30, 30, 15, 15, 10, 10, 15, 20, 20, 10, 15, 10, 20, 10, 15};
+int PRODUCT_PRICE[15] = {20, 30, 50, 60, 10, 100, 200, 150, 300, 250, 140, 420, 260, 780, 960};
+int COUNT_AT_BOX[15] = {20, 20, 10, 30, 20, 30, 10, 10, 20, 20, 10, 10, 20, 30, 20};
+int PURCHASE_PRICE[15] = {5, 5, 15, 15, 20, 10, 30, 25, 25, 30, 50, 30, 10, 40, 50};
 
 std::wstring GetProductName(int type) {
     return PRODUCT_NAME[type];
