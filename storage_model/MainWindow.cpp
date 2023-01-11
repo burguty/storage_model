@@ -193,7 +193,7 @@ void MainWindow::SendProducts() {
         int product_type = delivery->GetProductType();
         for (ProductBatch* batch : storage->ProductShipments(product_type, delivery->approved_count_)) {
             batch->SetColor(sf::Color(0, 191, 255, 120));
-            batch->StartMoving(delivery->GetTargetX(), delivery->GetTargetY(), 2);
+            batch->StartMoving(delivery->GetTargetX(), delivery->GetTargetY(), 1.2);
             delivery->AddProductBatch(batch);
             on_the_move.push_back(static_cast<IMovable*>(batch));
         }

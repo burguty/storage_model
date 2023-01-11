@@ -148,7 +148,7 @@ void TextLine::SetColor(sf::Color color) {
 }
 
 IMovable::IMovable() {}
-void IMovable::StartMoving(int target_x, int target_y, int time) {
+void IMovable::StartMoving(int target_x, int target_y, long double time) {
     target_x_ = target_x;
     target_y_ = target_y;
     x_start_ = x0_;

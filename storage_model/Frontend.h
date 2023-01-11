@@ -64,7 +64,7 @@ class IMovable : virtual public IDrawable {
 public:
     IMovable();
     virtual ~IMovable() {}
-    void StartMoving(int target_x, int target_y, int time);
+    void StartMoving(int target_x, int target_y, long double time);
     bool Move(long double time_delta);
 private:
     void Transfer(int x, int y);

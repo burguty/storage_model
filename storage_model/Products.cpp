@@ -119,8 +119,9 @@ void ProductBatch::draw(sf::RenderWindow& window) {
         texture_.setFillColor(sf::Color(30, 30, 30, 120));
         window.draw(texture_);
         sf::Text date(IntToString(GetRemains()), font_, 16);
-        date.setPosition(x0_, y0_);
-        date.setFillColor(sf::Color::Red);
+        date.setPosition(x0_ + 3, y0_ - 4);
+        date.setFillColor(sf::Color(0, 191, 255, 255));
+        date.setStyle(sf::Text::Bold);
         window.draw(date);
     }
 }

@@ -18,7 +18,7 @@ void Request::draw(sf::RenderWindow& window) {
     return;
 }
 void Request::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
-    sf::Text text(L"Заказа от " + name_ +
+    sf::Text text(L"Заказ от " + name_ +
         L"\nЗаказываемый товар - " + GetProductName(product_type_) +
         L"\nНеобходимое количество - " + IntToString(product_count_ / GetCountAtBox(product_type_)) + L"\nопт. упаковок"
         L"\n---" +
@@ -47,10 +47,10 @@ void Request::RecalculateProductCount(Storage* storage) {
     product_count_ = std::min(product_count_, storage->ProductsCount(product_type_));
 }
 int Request::GetTargetX() {
-    return customer_->GetX0();
+    return customer_->GetX0() + 50;
 }
 int Request::GetTargetY() {
-    return customer_->GetY0();
+    return customer_->GetY0() + 100 - 20;
 }
 void Request::AddProductBatch(ProductBatch* batch) {
     customer_->AddProductBatch(batch);
