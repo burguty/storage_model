@@ -79,7 +79,7 @@ void InfoField::TypeSymbol(char c) {
         if (visualization_type_ > 0) {
             if (c == 0)
                 input_lines_[0]->DeleteSymbol();
-            else
+            else if (input_lines_[0]->GetText().size() <= 4)
                 input_lines_[0]->TypeSymbol(c);
             if (visualization_type_ == 2) {
                 std::wstring count = input_lines_[0]->GetText();
@@ -106,7 +106,7 @@ void InfoField::ChangeMode(IClickable* new_object) {
         if (visualization_type_ == 1) {
             text_lines_.push_back(new TextLine(x0_, y0_ + height_ + 20,
                 180, 40, L"Новая цена:", font_, 20));
-            input_lines_.push_back(new InputLine(x0_ + 200 + 20, y0_ + height_ + 20,
+            input_lines_.push_back(new InputLine(x0_ + 130 + 20, y0_ + height_ + 20,
                 80, 40, font_));
             buttons_.push_back(new Button(x0_, y0_ + height_ + 20 + 40 + 20,
                 120, 40, L"Готово", font_));
@@ -116,7 +116,7 @@ void InfoField::ChangeMode(IClickable* new_object) {
         if (visualization_type_ == 2) {
             text_lines_.push_back(new TextLine(x0_, y0_ + height_ + 20,
                 180, 40, L"Количество оптовых упаковок:", font_, 20));
-            input_lines_.push_back(new InputLine(x0_ + 200 + 20, y0_ + height_ + 20,
+            input_lines_.push_back(new InputLine(x0_ + 300 + 20, y0_ + height_ + 20,
                 80, 40, font_));
             buttons_.push_back(new Button(x0_, y0_ + height_ + 20 + 40 + 20,
                 120, 40, L"Готово", font_));
@@ -128,16 +128,16 @@ void InfoField::ChangeMode(IClickable* new_object) {
             text_lines_.push_back(new TextLine(x0_, y0_ + height_ + 20,
                 180, 40, L"Заказать:", font_, 20));
 
-            input_lines_.push_back(new InputLine(x0_ + 200 + 20, y0_ + height_ + 20,
+            input_lines_.push_back(new InputLine(x0_ + 130 + 20, y0_ + height_ + 20,
                 80, 40, font_));
             input_lines_[0]->SetText(
                 IntToString(dynamic_cast<StorageRoom*>(object_)->GetOrderCount())
             );
 
             buttons_.push_back(new Button(x0_, y0_ + height_ + 20 + 40 + 20,
-                120, 40, L"Не заказывать", font_));
+                190, 40, L"Не заказывать", font_));
             buttons_.push_back(new Button(x0_, y0_ + height_ + 20 + 40 + 20 + 40 + 20,
-                120, 40, L"Оптимальное значение", font_));
+                290, 40, L"Оптимальное значение", font_));
         }
     }
 }
