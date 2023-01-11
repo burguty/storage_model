@@ -128,7 +128,7 @@ void ProductBatch::draw(sf::RenderWindow& window) {
 void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
     if (object_type_ == 1) {
         sf::Text information(L"Партия товара \"" + GetProductName(product_type_) + L"\"" +
-            L"\nКоличество в оптовых упаковок - " + IntToString(box_count_) + L" шт." +
+            L"\nКоличество оптовых упаковок - " + IntToString(box_count_) + L" шт." +
             L"\nСрок годности - " + IntToString(Remains()) + L" дней" +
             L"\nЦена - " + IntToString(Price()) + L" руб/шт" +
             L"\nЗакупочная цена - " + IntToString(purchase_price_) + L" руб/шт" +
