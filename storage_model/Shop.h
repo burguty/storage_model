@@ -15,15 +15,18 @@ public:
     virtual int GetVisualizationType();
     virtual IClickable* Click(int x, int y);
     Request* MakeRequest(Storage* storage);
+    std::wstring GetName();
     int GetX0();
     int GetY0();
     void AddProductBatch(ProductBatch* batch);
+    std::wstring shop_name_ = L"Покупатель ";
 private:
     int CalculateX0(int index);
     int CalculateY0(int index);
     std::mt19937& gen_;
     const int width_ = 100, height_ = 100;
-    std::wstring shop_name_ = L"Имя магазина";
+   
+    sf::Text sfml_shop_name_;
     int requests_sum_ = 0;
     sf::RectangleShape texture_;
 };

@@ -11,12 +11,14 @@ sf::Vector2i const gaps[15] = {
 Request::Request(int product_type, int product_count, Shop* customer) : 
     IClickable(), IDrawable(-1, -1), 
     product_type_(product_type), product_count_(product_count), 
-    customer_(customer), name_(L"Пятёрочка") {}
+    customer_(customer) {
+    name_ = customer->shop_name_;
+}
 void Request::draw(sf::RenderWindow& window) {
     return;
 }
 void Request::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
-    sf::Text text(L"Заказа от магазина " + name_ +
+    sf::Text text(L"Заказа от " + name_ +
         L"\nЗаказываемый товар - " + GetProductName(product_type_) +
         L"\nНеобходимое количество - " + IntToString(product_count_ / GetCountAtBox(product_type_)) + L"\nопт. упаковок"
         L"\n---" +
@@ -61,6 +63,18 @@ Shop::Shop(int index, sf::Font& font, std::mt19937& gen) :
     texture_.setSize(sf::Vector2f(width_, height_));
     texture_.setOutlineThickness(3);
     texture_.setOutlineColor(sf::Color::Black);
+    index *= 2;
+    if (index > 0)
+        index--;
+    else
+        index = abs(index);
+    index++;
+    shop_name_ += IntToString(index);
+    sfml_shop_name_.setFont(font);
+    sfml_shop_name_.setPosition(x0_, y0_);
+    sfml_shop_name_.setFillColor(sf::Color::Black);
+    sfml_shop_name_.setString(shop_name_);
+    sfml_shop_name_.setCharacterSize(16);
 }
 int Shop::CalculateX0(int index) {
     return (1150 + 30) / 2 - 100 / 2 + index * ((1150 - 30 - 7 * 100) / 8) + index * 100;
@@ -68,12 +82,16 @@ int Shop::CalculateX0(int index) {
 int Shop::CalculateY0(int index) {
     return 30 + 15 + abs(index) * 40;
 }
+std::wstring Shop::GetName() {
+    return shop_name_;
+}
 void Shop::draw(sf::RenderWindow& window) {
     window.draw(texture_);
+    window.draw(sfml_shop_name_);
 }
 void Shop::DrawInformation(sf::RenderWindow& window,
     int x0, int y0, sf::Font& font) {
-    sf::Text text(L"Магазин \"" + shop_name_ + L"\"" + 
+    sf::Text text(shop_name_ + 
         L"\nТоваров куплено на " + IntToString(requests_sum_) + L" руб.",
         font, 24);
     text.setPosition(x0 + 5, y0 + 5);

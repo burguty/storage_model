@@ -47,7 +47,7 @@ bool MainWindow::MainLoop(ModelData* data) {
                     ClearMemory();
                     return false;
                 }
-                if(condition == 7)
+                if (condition == 7)
                     continue;
                 if (condition == 3) {
                     if (info_field->Click(x, y)) {
@@ -165,23 +165,8 @@ bool MainWindow::MainLoop(ModelData* data) {
             text_day->SetText(L"День номер " + IntToString(day + 1));
             storage->GoToTheNextDay();
             ClearStorage();
-            condition = 6;
-        }
-        // Анимация удаления просрочки
-        if (condition == 6) {
-            if (!on_the_move.empty()) {
-                auto it = on_the_move.begin();
-                while (it != on_the_move.end()) {
-                    if ((*it)->Move(time)) {
-                        delete (*it);
-                        it = on_the_move.erase(it);
-                    } else
-                        ++it;
-                }
-            } else {
-                condition = 1;
-                on_the_move = storage->GoToTheNextDayCars();
-            }
+            condition = 1;
+            on_the_move = storage->GoToTheNextDayCars();
         }
         DrawInterface(window);
         storage->draw(window);
@@ -199,8 +184,7 @@ bool MainWindow::MainLoop(ModelData* data) {
 void MainWindow::ClearStorage() {
     std::vector<ProductBatch*>trash = storage->Clearing();
     for (ProductBatch* batch : trash) {
-        batch->StartMoving(1000, 1000, 2);
-        on_the_move.push_back(static_cast<IMovable*>(batch));
+        delete batch;
     }
 }
 

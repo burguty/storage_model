@@ -11,7 +11,7 @@ bool CheckInputedFields(CheckBox* check_boxes[], InputLine* inputing_field_code[
             if (!check_boxes[i - 2]->GetStatus() || (check_boxes[i - 2]->GetStatus() &&
                 !inputing_field_code[i]->GetText().empty() && 
                 std::stoi(inputing_field_code[i]->GetText()) <= GetMaxBoxCount(i - 2) && 
-                std::stoi(inputing_field_code[i]->GetText()) > 0)) {
+                std::stoi(inputing_field_code[i]->GetText()) >= 0)) {
                 continue;
             }
         }
@@ -102,8 +102,8 @@ ModelData* OpenWindow::MainLoop() {
                 }
 
                 bool is_any_input_clicked = false;
-                for (int i = 0; i < 15; ++i) {
-                    if (i >= 2 && i <= 14) {
+                for (int i = 0; i < 17; ++i) {
+                    if (i >= 2 && i <= 16) {
                         if (check_boxes[i - 2]->GetStatus() &&
                             inputing_field_code[i]->Click(x, y)) {
                             if (current_inputing > -1) {

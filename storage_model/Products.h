@@ -12,6 +12,7 @@ public:
     virtual ~IProduct();
     int ProductType();
     int Price();
+    int GetRemains();
     void GoToTheNextDay();
     bool IsOverdue();
     void SetColor(sf::Color color);
@@ -39,9 +40,9 @@ public:
 class ProductBatch : public IProduct, public IClickable, public IMovable {
 public:
     ProductBatch(int product_type, int price, int purchase_price, 
-        int box_count, int x0, int y0);
+        int box_count, int x0, int y0, sf::Font& font);
     ProductBatch(int product_type, int price, int purchase_price, 
-        int box_count, int days, int x0, int y0);
+        int box_count, int days, int x0, int y0, sf::Font& font);
     int PurchasePrice();
     void Reduction(int new_cost);
     int ProductsCount();
@@ -62,6 +63,7 @@ private:
     int count_at_box_, box_count_, purchase_price_;
     const int width = 15, height = 15;
     sf::RectangleShape texture_;
+    sf::Font& font_;
 };
 
 class StorageRoom : public IClickable {
@@ -110,6 +112,7 @@ private:
     const int width_ = 150, height_ = 90, step_ = 10, in_line_ = 5;
     sf::RectangleShape texture_;
     sf::Text back_text_;
+    sf::Font& font_;
 };
 
 class Storage : public IClickable {

@@ -47,19 +47,24 @@ void IProduct::CalculateColor() {
         back_color_ = sf::Color(0, 255, 0, 120);
     }
 }
+int IProduct::GetRemains() {
+    return remains_;
+}
 
 // ProductBatch
-ProductBatch::ProductBatch(int product_type, int price, int purchase_price, int box_count, int x0, int y0) :
+ProductBatch::ProductBatch(int product_type, int price, int purchase_price, int box_count, int x0, int y0, sf::Font& font) :
     IProduct(product_type, price), IDrawable(x0, y0),
-    count_at_box_(GetCountAtBox(product_type)), box_count_(box_count), purchase_price_(purchase_price) {
+    count_at_box_(GetCountAtBox(product_type)), box_count_(box_count), 
+    purchase_price_(purchase_price), font_(font) {
     texture_.setOutlineThickness(3);
     texture_.setOutlineColor(sf::Color(0, 0, 0, 150));
     texture_.setSize(sf::Vector2f(width, height));
     object_type_ = 1;
 }
-ProductBatch::ProductBatch(int product_type, int price, int purchase_price, int box_count, int days, int x0, int y0) :
+ProductBatch::ProductBatch(int product_type, int price, int purchase_price, int box_count, int days, int x0, int y0, sf::Font& font) :
     IProduct(product_type, price, days), IDrawable(x0, y0),
-    count_at_box_(GetCountAtBox(product_type)), box_count_(box_count), purchase_price_(purchase_price) {
+    count_at_box_(GetCountAtBox(product_type)), box_count_(box_count),
+    purchase_price_(purchase_price), font_(font) {
     texture_.setOutlineThickness(3);
     texture_.setOutlineColor(sf::Color(0, 0, 0, 150));
     texture_.setSize(sf::Vector2f(width, height));
@@ -107,13 +112,17 @@ void ProductBatch::draw(sf::RenderWindow& window) {
     if (object_type_ == 1) {
         texture_.setPosition(x0_, y0_);
         texture_.setFillColor(back_color_);
+        window.draw(texture_);
         
     } else {
         texture_.setPosition(x0_, y0_);
         texture_.setFillColor(sf::Color(30, 30, 30, 120));
-
+        window.draw(texture_);
+        sf::Text date(IntToString(GetRemains()), font_, 16);
+        date.setPosition(x0_, y0_);
+        date.setFillColor(sf::Color::Red);
+        window.draw(date);
     }
-    window.draw(texture_);
 }
 void ProductBatch::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
     if (object_type_ == 1) {
@@ -145,9 +154,10 @@ void ProductBatch::Move(int x, int y) {
 
 // StorageRoom
 StorageRoom::StorageRoom(int product_type, int x0, int y0, sf::Font& font) :
-    IDrawable(x0, y0), product_type_(product_type), 
+    IDrawable(x0, y0), product_type_(product_type),
     count_at_box_(GetCountAtBox(product_type)),
-    max_box_count_(GetMaxBoxCount(product_type)) {
+    max_box_count_(GetMaxBoxCount(product_type)),
+    font_(font) {
     texture_.setPosition(x0, y0);
     texture_.setFillColor(sf::Color::White);
     texture_.setSize(sf::Vector2f(width_, height_));
@@ -183,7 +193,7 @@ std::vector<ProductBatch*> StorageRoom::ProductShipments(int box_count) {
         } else {
             result.push_back(new ProductBatch(product_type_, batches_[0]->Price(),
                 batches_[0]->PurchasePrice(),
-                count, x0_, y0_));
+                count, x0_, y0_, font_));
             batches_[0]->Sell(count);
         }
         income_ += result.back()->Price() * count;
@@ -234,6 +244,9 @@ int StorageRoom::ProductsCount() {
     for (ProductBatch* batch : batches_) {
         result += batch->ProductsCount();
     }
+    for (ProductBatch* batch : purchases_) {
+        result += batch->ProductsCount();
+    }
     return result;
 }
 int StorageRoom::ProductsPrice() {
@@ -267,6 +280,8 @@ int StorageRoom::BoxCount() {
     int result = 0;
     for (ProductBatch* batch : batches_)
         result += batch->BoxCount();
+    for (ProductBatch* batch : purchases_)
+        result += batch->BoxCount();
     return result;
 }
 void StorageRoom::GoToTheNextDay() {
@@ -282,7 +297,7 @@ void StorageRoom::StartPurchasePhase(int purchase_price, int time_of_purchase) {
 void StorageRoom::StopPurchasePhase() {
     if (order_count_ > 0) {
         purchases_.push_back(new ProductBatch(product_type_, GetProductPrice(product_type_), purchase_price_, 
-            order_count_, time_of_purchase_, CalculateXForPurchase(), CalculateYForPurchase()));
+            order_count_, time_of_purchase_, CalculateXForPurchase(), CalculateYForPurchase(), font_));
     }
     mode_ = 0;
 }
@@ -351,6 +366,7 @@ void StorageRoom::draw(sf::RenderWindow& window) {
         box_count.setPosition(x0_ + 10, y0_ + 5 + 26 + 5);
         box_count.setFillColor(IsOrderCountCorrect() ?
             sf::Color(0, 141, 205, 255) : sf::Color(185, 41, 105));
+        box_count.setCharacterSize(20);
         window.draw(box_count);
     }
 }
@@ -361,7 +377,7 @@ void StorageRoom::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::
             L"\nКоличество партий - " + IntToString(batches_.size()) + L" шт." +
             L"\nКоличество товаров - " + IntToString(ProductsCount()) + L" шт." +
             L"\nОбщая цена товаров - " + IntToString(ProductsPrice()) + L" руб." +
-            L"\nПрибыль от проданных товаров - " + IntToString(income_) + L" руб." +
+            L"\nДоход - " + IntToString(income_) + L" руб." +
             L"\nЧистая прибыль - " + IntToString(income_ - expenses_) + L" руб."
             );
         information.setCharacterSize(24);
@@ -404,7 +420,7 @@ Storage::Storage(ModelData* data, int x0, int y0, sf::Font& font) :
                     GetProductPrice(product_type),
                     GetProductPrice(product_type) / 2,
                     data->GetCountProduct(product_type),
-                    0, 0));
+                    0, 0, font));
             }
             nomb++;
         } else {
@@ -498,7 +514,7 @@ IClickable* Storage::Click(int x, int y) {
 }
 void Storage::DrawInformation(sf::RenderWindow& window, int x0, int y0, sf::Font& font) {
     sf::Text information(L"Склад\nОбщая цена товаров - " + IntToString(Price()) + L" руб." +
-        L"\nПрибыль от проданных товаров - " + IntToString(Income()) + L" руб." +
+        L"\nДоход - " + IntToString(Income()) + L" руб." +
         L"\nЧистая прибыль - " + IntToString(Profit()) + L" руб.",
         font, 24);
     information.setPosition(x0 + 5, y0 + 5);
